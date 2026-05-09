@@ -1,4 +1,4 @@
-const VERSION = "1.2.7";
+const VERSION = "1.2.8";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -20,6 +20,11 @@ const TRANSLATIONS = {
     window_label: "Windows (List)", battery_label: "Batteries (List)", name: "Name", icon: "Icon", color: "Icon Color",
     humid_warn_threshold: "Humidity Warning Threshold (%)", high_humidity: "High humidity", device_unavailable: "Device unavailable",
     force_color: "Force Manual Color (Always visible)", img_url: "Image URL", image: "Image", path: "Path (Tap Action)", entity: "Entity", device: "Device (Optional)",
+    image_entity: "Light Entity (Grayscale when off)", image_entity_help: "When the selected light/switch is off, the header image fades to grayscale.",
+    show_image: "Show background image",
+    presence_sensor: "Presence Sensor (Motion/Person)", presence_detected: "Present",
+    area_setup: "Area Setup", area_setup_desc: "Automatically populate controls and sensors from area entities", area_picker: "Home Assistant Area", area_generate: "Generate from Area", area_no_entities: "No entities found in this area",
+    alert_sensors: "Alert Sensors", alert_sensor_add: "Add Alert Sensor", alert_sensor_entity: "Sensor", alert_sensor_above: "Above", alert_sensor_below: "Below", alert_sensor_state: "State", alert_border_color: "Card Border Color", alert_chip_collapsed: "Show as badges (collapsed)", active_alerts: "Active Alerts",
     template: "Type Filter", add_template: "with Filter", add_prefix: "Add",
     quick_add_title: "Quick Add",
     quick_add_desc: "Quickly add buttons from existing entities.",
@@ -42,7 +47,7 @@ const TRANSLATIONS = {
     row_type: "Row Type", type_entity: "Entity", type_template: "Template",
     tmpl_content: "Content (Template)", tmpl_icon: "Icon (Template)", tmpl_color: "Color (Template)", tmpl_state: "State (Template)", tmpl_preview: "Preview",
     tmpl_light: "Light", tmpl_switch: "Switch / Socket", tmpl_select: "Select", tmpl_climate: "Climate", tmpl_cover: "Cover / Shutter", tmpl_media: "Media Player",
-    show_state: "Show State", show_label: "Show Label", show_icon: "Show Icon", show_last_changed: "Last Changed", lc_just_now: "just now", state_first: "State First", text_layout: "Text Order", primary_text: "First line", primary_state: "State / value first", primary_name: "Name first",
+    show_state: "Show State", show_label: "Show Label", show_icon: "Show Icon", show_last_changed: "Last Changed", show_sparkline: "Show Sparkline", sparkline_hours: "History (hours)", lc_just_now: "just now", state_first: "State First", text_layout: "Text Order", primary_text: "First line", primary_state: "State / value first", primary_name: "Name first",
     height: "Height", width: "Width", align: "Align", visible: "Visible", left: "Left", center: "Center", right: "Right",
     tap_action: "Tap Action", hold_action: "Hold Action", double_tap_action: "Double Tap Action",
     actions: "Actions",
@@ -77,6 +82,7 @@ const TRANSLATIONS = {
     cover_presets_label: "Preset Values (comma-separated)",
     show_climate_presets: "Temperature Presets",
     climate_presets_label: "Temperatures (comma-separated)",
+    show_hvac_modes: "HVAC Mode Chips", show_fan_modes: "Fan Speed Chips",
     show_brightness_presets: "Brightness Presets",
     brightness_presets_label: "Brightness values (comma-separated)",
     show_brightness_value: "Show Brightness %",
@@ -98,6 +104,11 @@ const TRANSLATIONS = {
     window_label: "Fenster (Liste)", battery_label: "Batterien (Liste)", name: "Name", icon: "Icon", color: "Iconfarbe",
     humid_warn_threshold: "Feuchte-Warnschwelle (%)", high_humidity: "Hohe Luftfeuchtigkeit", device_unavailable: "Gerät nicht verfügbar",
     force_color: "Manuelle Farbe erzwingen (Immer sichtbar)", img_url: "Bild URL", image: "Bild", path: "Pfad (Tap Action)", entity: "Entität", device: "Gerät (Optional)",
+    image_entity: "Licht-Entität (Graustufen wenn aus)", image_entity_help: "Wenn die gewählte Licht-/Schalter-Entität aus ist, wird das Header-Bild in Graustufen dargestellt.",
+    show_image: "Hintergrundbild anzeigen",
+    presence_sensor: "Anwesenheits-Sensor (Bewegung/Person)", presence_detected: "Anwesend",
+    area_setup: "Bereich-Setup", area_setup_desc: "Steuerungen und Sensoren automatisch aus dem Bereich übernehmen", area_picker: "Home Assistant Bereich", area_generate: "Aus Bereich generieren", area_no_entities: "Keine Entitäten in diesem Bereich gefunden",
+    alert_sensors: "Alarm-Sensoren", alert_sensor_add: "Alarm-Sensor hinzufügen", alert_sensor_entity: "Sensor", alert_sensor_above: "Über", alert_sensor_below: "Unter", alert_sensor_state: "Zustand", alert_border_color: "Kartenrahmenfarbe", alert_chip_collapsed: "Als Sammel-Badge anzeigen", active_alerts: "Aktive Alarme",
     template: "Typ-Filter", add_template: "mit Filter", add_prefix: "Add",
     quick_add_title: "Schnellerfassung",
     quick_add_desc: "Schnell Buttons aus bestehenden Entitäten hinzufügen.",
@@ -120,7 +131,7 @@ const TRANSLATIONS = {
     row_type: "Zeilentyp", type_entity: "Entität", type_template: "Template",
     tmpl_content: "Text (Template)", tmpl_icon: "Icon (Template)", tmpl_color: "Farbe (Template)", tmpl_status: "Status (Template)", tmpl_preview: "Vorschau",
     tmpl_light: "Licht", tmpl_switch: "Schalter / Steckdose", tmpl_select: "Auswahl", tmpl_climate: "Klima", tmpl_cover: "Rollladen / Abdeckung", tmpl_media: "Media Player",
-    show_state: "Status anzeigen", show_label: "Bezeichnung anzeigen", show_icon: "Icon anzeigen", show_last_changed: "Letzte Änderung", lc_just_now: "gerade eben", state_first: "Wert zuerst", text_layout: "Text-Reihenfolge", primary_text: "Erste Zeile", primary_state: "Wert zuerst", primary_name: "Name zuerst",
+    show_state: "Status anzeigen", show_label: "Bezeichnung anzeigen", show_icon: "Icon anzeigen", show_last_changed: "Letzte Änderung", show_sparkline: "Sparkline anzeigen", sparkline_hours: "Verlauf (Stunden)", lc_just_now: "gerade eben", state_first: "Wert zuerst", text_layout: "Text-Reihenfolge", primary_text: "Erste Zeile", primary_state: "Wert zuerst", primary_name: "Name zuerst",
     height: "Höhe", width: "Breite", align: "Ausrichtung", visible: "Sichtbar", left: "Links", center: "Mitte", right: "Rechts",
     tap_action: "Antippen", hold_action: "Gedrückt halten", double_tap_action: "Doppelklick",
     actions: "Aktionen",
@@ -159,6 +170,7 @@ const TRANSLATIONS = {
     cover_presets_label: "Voreinstellungen (kommagetrennt)",
     show_climate_presets: "Temperatur-Voreinstellungen",
     climate_presets_label: "Temperaturen (kommagetrennt)",
+    show_hvac_modes: "HVAC-Modus-Chips", show_fan_modes: "Lüftergeschwindigkeit-Chips",
     show_brightness_presets: "Helligkeits-Voreinstellungen",
     brightness_presets_label: "Helligkeiten (kommagetrennt)",
     show_brightness_value: "Helligkeit % anzeigen",
@@ -180,6 +192,11 @@ const TRANSLATIONS = {
     window_label: "Fenêtres (Liste)", battery_label: "Batteries (Liste)", name: "Nom", icon: "Icône", color: "Couleur",
     humid_warn_threshold: "Seuil d'alerte d'humidité (%)", high_humidity: "Humidité élevée", device_unavailable: "Appareil indisponible",
     force_color: "Forcer la couleur", img_url: "URL de l'image", image: "Image", path: "Chemin (Tap Action)", entity: "Entité", device: "Appareil (Optionnel)",
+    image_entity: "Entité lumineuse (Niveaux de gris si éteint)", image_entity_help: "Lorsque l'entité sélectionnée est éteinte, l'image d'en-tête passe en niveaux de gris.",
+    show_image: "Afficher l'image de fond",
+    presence_sensor: "Capteur de présence (Mouvement/Personne)", presence_detected: "Présent",
+    area_setup: "Configuration de zone", area_setup_desc: "Remplir automatiquement les contrôles et capteurs à partir des entités de la zone", area_picker: "Zone Home Assistant", area_generate: "Générer depuis la zone", area_no_entities: "Aucune entité trouvée dans cette zone",
+    alert_sensors: "Capteurs d'alerte", alert_sensor_add: "Ajouter un capteur d'alerte", alert_sensor_entity: "Capteur", alert_sensor_above: "Supérieur à", alert_sensor_below: "Inférieur à", alert_sensor_state: "État", alert_border_color: "Couleur du contour", alert_chip_collapsed: "Afficher en badge groupé", active_alerts: "Alertes actives",
     template: "Filtre de type", add_template: "avec filtre", add_prefix: "Ajouter",
     quick_add_title: "Ajout rapide",
     quick_add_desc: "Ajouter rapidement des boutons à partir d’entités existantes.",
@@ -202,7 +219,7 @@ const TRANSLATIONS = {
     row_type: "Type de ligne", type_entity: "Entité", type_template: "Template",
     tmpl_content: "Contenu (Template)", tmpl_icon: "Icône (Template)", tmpl_color: "Couleur (Template)", tmpl_state: "État (Template)", tmpl_preview: "Aperçu",
     tmpl_light: "Lumière", tmpl_switch: "Interrupteur / Prise", tmpl_select: "Sélection", tmpl_climate: "Climatisation", tmpl_cover: "Volet / Store", tmpl_media: "Lecteur multimédia",
-    show_state: "Afficher l’état", show_label: "Afficher le libellé", show_icon: "Afficher l’icône", show_last_changed: "Dernier changement", lc_just_now: "à l’instant", state_first: "Valeur d’abord", text_layout: "Ordre du texte", primary_text: "Première ligne", primary_state: "Valeur d’abord", primary_name: "Nom d’abord",
+    show_state: "Afficher l’état", show_label: "Afficher le libellé", show_icon: "Afficher l’icône", show_last_changed: "Dernier changement", show_sparkline: "Afficher la Sparkline", sparkline_hours: "Historique (heures)", lc_just_now: "à l’instant", state_first: "Valeur d’abord", text_layout: "Ordre du texte", primary_text: "Première ligne", primary_state: "Valeur d’abord", primary_name: "Nom d’abord",
     height: "Hauteur", width: "Largeur", align: "Alignement", visible: "Visible", left: "Gauche", center: "Centre", right: "Droite",
     tap_action: "Appui court", hold_action: "Appui long", double_tap_action: "Double appui",
     actions: "Actions",
@@ -236,6 +253,7 @@ const TRANSLATIONS = {
     cover_presets_label: "Valeurs (séparées par virgule)",
     show_climate_presets: "Préréglages de température",
     climate_presets_label: "Températures (séparées par virgule)",
+    show_hvac_modes: "Boutons mode HVAC", show_fan_modes: "Boutons vitesse ventilateur",
     show_brightness_presets: "Préréglages de luminosité",
     brightness_presets_label: "Luminosités (séparées par virgule)",
     show_brightness_value: "Afficher luminosité %",
@@ -527,6 +545,10 @@ class OneLineRoomCard extends HTMLElement {
     this._cachedEntityIds = null;
     this._activeTimers = new Set();
     this._lastChangedInterval = null;
+    this._sparklineCache = new Map();
+    this._sparklinePending = new Map();
+    this._sparklineInterval = null;
+    this._sparklineRefreshSec = 300;
   }
 
   disconnectedCallback() {
@@ -536,6 +558,11 @@ class OneLineRoomCard extends HTMLElement {
       clearInterval(this._lastChangedInterval);
       this._lastChangedInterval = null;
     }
+    if (this._sparklineInterval) {
+      clearInterval(this._sparklineInterval);
+      this._sparklineInterval = null;
+    }
+    this._sparklinePending.clear();
   }
 
   set hass(hass) {
@@ -568,6 +595,8 @@ class OneLineRoomCard extends HTMLElement {
     if (!this.content) this.render();
     this.updateContent();
     this._setupLastChangedInterval();
+    this._sparklineRefreshSec = clampNum(config.sparkline_refresh, 60, 3600, 300);
+    this._setupSparklineInterval();
   }
 
   _setupLastChangedInterval() {
@@ -579,6 +608,176 @@ class OneLineRoomCard extends HTMLElement {
     const hasCardLastActivity = this.config?.show_card_last_activity === true;
     if (hasLastChanged || hasCardLastActivity) {
       this._lastChangedInterval = setInterval(() => { this.updateContent(); }, 60000);
+    }
+  }
+
+  _hasSparklineControls() {
+    return (this.config?.controls || []).some((ctrl) => {
+      const domain = ctrl?.entity?.split?.(".")?.[0];
+      return domain === "sensor" && ctrl.show_sparkline === true;
+    });
+  }
+
+  _setupSparklineInterval() {
+    if (this._sparklineInterval) {
+      clearInterval(this._sparklineInterval);
+      this._sparklineInterval = null;
+    }
+    if (!this._hasSparklineControls()) return;
+    this._sparklineInterval = setInterval(() => {
+      this._refreshSparklineData();
+    }, this._sparklineRefreshSec * 1000);
+    this._refreshSparklineData();
+  }
+
+  _getSparklineCacheKey(entity, hours) {
+    return `${entity}|${hours}`;
+  }
+
+  async _fetchSparklineData(entity, hours) {
+    if (!entity || !this._hass) return [];
+    const key = this._getSparklineCacheKey(entity, hours);
+    if (this._sparklinePending.has(key)) return this._sparklinePending.get(key);
+    const promise = (async () => {
+      try {
+        const start = new Date(Date.now() - hours * 3600000);
+        const result = await this._hass.callWS({
+          type: "history/history_during_period",
+          entity_ids: [entity],
+          start_time: start.toISOString(),
+          end_time: new Date().toISOString(),
+          minimal_response: true,
+          no_attributes: true
+        });
+        const raw = result[entity] || (Array.isArray(result) && result.length > 0 ? result[0] : []);
+        const points = [];
+        for (const item of raw) {
+          if (!item) continue;
+          let state; let ts;
+          if (Array.isArray(item)) {
+            state = item[0];
+            ts = item[1] ? new Date(item[1]) : null;
+          } else if (typeof item === "object") {
+            state = item.state ?? item.s;
+            const timeVal = item.last_changed ?? item.last_updated ?? item.lu ?? item.lc;
+            if (typeof timeVal === "number") ts = new Date(timeVal * 1000);
+            else if (timeVal) ts = new Date(timeVal);
+          }
+          if (!ts || state == null) continue;
+          const value = parseFloat(String(state));
+          if (Number.isNaN(value)) continue;
+          points.push({ ts: ts.getTime(), value });
+        }
+        if (points.length === 0) return [];
+        if (points.length === 1) {
+          const value = points[0].value;
+          return [{ x: 0, y: value }, { x: 1, y: value }];
+        }
+        const startTime = points[0].ts;
+        let endTime = points[points.length - 1].ts;
+        if (endTime === startTime) endTime = startTime + 1;
+        return points.map(p => ({ x: (p.ts - startTime) / (endTime - startTime), y: p.value }));
+      } catch (err) {
+        return [];
+      } finally {
+        this._sparklinePending.delete(key);
+      }
+    })();
+    this._sparklinePending.set(key, promise);
+    const data = await promise;
+    this._sparklineCache.set(key, data);
+    this._updateSparklineElements(key, data);
+    return data;
+  }
+
+  async _refreshSparklineData() {
+    if (!this._hasSparklineControls() || !this._hass) return;
+    const requests = [];
+    for (const ctrl of this.config.controls || []) {
+      if (ctrl?.show_sparkline !== true) continue;
+      const domain = ctrl?.entity?.split?.(".")?.[0];
+      if (domain !== "sensor") continue;
+      const hours = clampNum(ctrl.sparkline_hours, 1, 168, 24);
+      const key = this._getSparklineCacheKey(ctrl.entity, hours);
+      requests.push(this._fetchSparklineData(ctrl.entity, hours));
+      if (!this._sparklineCache.has(key)) this._sparklineCache.set(key, []);
+    }
+    await Promise.all(requests);
+  }
+
+  _updateSparklineElements(key, data) {
+    const wrappers = this.shadowRoot?.querySelectorAll?.(`.btn-sparkline[data-sparkline-key="${key}"]`) || [];
+    wrappers.forEach(wrapper => {
+      const btn = wrapper.closest(".btn");
+      if (!btn) return;
+      const stroke = getComputedStyle(btn).getPropertyValue("--icon-color") || "currentColor";
+      if (!data || data.length === 0) {
+        wrapper.style.display = "none";
+        const svg = wrapper.querySelector("svg"); if (svg) svg.innerHTML = "";
+      } else {
+        wrapper.style.display = "block";
+        this._drawSparkline(wrapper, data, stroke.trim() || "currentColor");
+      }
+    });
+  }
+
+  _drawSparkline(wrapper, normalizedPoints, stroke) {
+    const svg = wrapper.querySelector("svg");
+    if (!svg) return;
+    if (!normalizedPoints || normalizedPoints.length === 0) {
+      svg.innerHTML = "";
+      return;
+    }
+    const points = normalizedPoints.map(p => ({
+      x: Math.max(0, Math.min(100, p.x * 100)),
+      y: Number.isFinite(p.y) ? p.y : 0
+    }));
+    const maxVal = Math.max(...points.map(p => p.y));
+    const minVal = Math.min(...points.map(p => p.y));
+    const range = maxVal - minVal;
+    const scaled = points.map(p => {
+      const y = range === 0
+        ? 11
+        : Math.max(2, Math.min(20, 20 - ((p.y - minVal) / range) * 18));
+      return `${p.x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+    svg.innerHTML = `
+      <line x1="0" y1="20" x2="100" y2="20" stroke="${stroke}" stroke-opacity="0.2" stroke-width="1" vector-effect="non-scaling-stroke" />
+      <polyline points="${scaled}" fill="none" stroke="${stroke}" stroke-opacity="0.95" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    `;
+  }
+
+  _renderBtnSparkline(btn, ctrl, color) {
+    const entityId = ctrl.entity;
+    const domain = entityId?.split?.(".")?.[0];
+    const enabled = ctrl.show_sparkline === true && domain === "sensor";
+    const hours = clampNum(ctrl.sparkline_hours, 1, 168, 24);
+    const key = this._getSparklineCacheKey(entityId, hours);
+    let wrapper = btn.querySelector(".btn-sparkline");
+    if (!enabled) {
+      if (wrapper) wrapper.remove();
+      btn.classList.remove("has-sparkline");
+      return;
+    }
+    if (!wrapper) {
+      wrapper = document.createElement("div");
+      wrapper.className = "btn-sparkline";
+      wrapper.innerHTML = `<svg viewBox="0 0 100 22" preserveAspectRatio="none"></svg>`;
+      btn.appendChild(wrapper);
+    }
+    btn.classList.add("has-sparkline");
+    wrapper.dataset.sparklineKey = key;
+    wrapper.dataset.sparklineEntity = entityId || "";
+    wrapper.dataset.sparklineHours = String(hours);
+    const data = this._sparklineCache.has(key) ? this._sparklineCache.get(key) : undefined;
+    if (!data || data.length === 0) {
+      wrapper.style.display = "none";
+    } else {
+      wrapper.style.display = "block";
+      this._drawSparkline(wrapper, data, color || "currentColor");
+    }
+    if (!this._sparklinePending.has(key) && !this._sparklineCache.has(key)) {
+      this._fetchSparklineData(entityId, hours);
     }
   }
 
@@ -604,9 +803,14 @@ class OneLineRoomCard extends HTMLElement {
         ha-card { position: relative; overflow: hidden; border-radius: 16px; background: none; border: none; cursor: default; }
         ha-card.warning-battery { outline: 2px solid var(--error-color, #d32f2f); outline-offset: -2px; }
         ha-card.warning-humidity { outline: 2px solid var(--info-color, #2196F3); outline-offset: -2px; box-shadow: 0 0 0 2px rgba(33,150,243,0.35), 0 0 12px rgba(33,150,243,0.35), 0 0 22px rgba(33,150,243,0.25); }
+        ha-card.alert-sensor { outline: 2px solid var(--rc-alert-border-color, var(--error-color, #d32f2d)); outline-offset: -2px; box-shadow: 0 0 0 2px rgba(211,47,47,0.15); }
         .container { display: flex; flex-direction: column; background: var(--ha-card-background, rgba(255,255,255,0.1)); border-radius: 16px; }
         .img-box { position: relative; width: 100%; height: 120px; overflow: hidden; border-radius: 16px 16px 0 0; background: #444; cursor: pointer; }
-        .img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .img-box.no-image { background: transparent; }
+        .img-box.no-image .img { display: none; }
+        .img-box.no-image .overlay { background: none; position: relative; }
+        .img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.8s ease; }
+        .img.grayscale { filter: grayscale(100%) brightness(0.6); }
         .overlay { position: absolute; top: 0; left: 0; width: 100%; padding: 12px; box-sizing: border-box; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); display: flex; align-items: center; gap: 12px; }
         .text { display: flex; flex: 1; min-width: 0; flex-direction: column; align-items: flex-start; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         ha-icon { color: var(--icon-color, white); }
@@ -621,6 +825,10 @@ class OneLineRoomCard extends HTMLElement {
         .chip.info { background: #E3F2FD; color: #1976D2; }
         .chip.custom { background: var(--chip-bg); color: var(--chip-color); }
         .controls { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
+        .btn.has-sparkline { height: auto; align-items: stretch; overflow: visible; flex-wrap: wrap; padding-bottom: 6px; }
+        .btn-sparkline { width: 100%; flex: 0 0 100%; order: 99; align-self: stretch; min-height: 28px; margin-top: 6px; display: flex; align-items: center; padding: 4px 6px; border-radius: 12px; background: rgba(255,255,255,0.06); box-sizing: border-box; }
+        .btn-sparkline svg { width: 100%; height: 22px; display: block; overflow: visible; }
+        .btn-sparkline polyline { fill: none; vector-effect: non-scaling-stroke; }
         .btn { position: relative; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 12px; cursor: pointer; background: var(--rc-btn-bg, var(--btn-bg, var(--card-background-color, rgba(128,128,128,0.05)))); border: 1px solid transparent; flex-grow: 1; flex-shrink: 1; min-width: 0; overflow: hidden; box-sizing: border-box; transition: background 0.2s; user-select: none; -webkit-user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; flex-basis: var(--btn-flex-basis, auto); height: var(--btn-height, 60px); justify-content: var(--btn-justify, center); }
         .btn.label-right { flex-direction: row; align-items: center; justify-content: var(--btn-justify, center); gap: 10px; padding: 0 10px; }
         .btn.label-left { flex-direction: row-reverse; align-items: center; justify-content: var(--btn-justify, center); gap: 10px; padding: 0 10px; }
@@ -758,11 +966,14 @@ class OneLineRoomCard extends HTMLElement {
       if (typeof id === "string" && id.trim()) ids.add(id.trim());
     };
     add(cfg.entity);
+    add(cfg.image_entity);
+    add(cfg.presence_sensor);
     add(cfg.temp_sensor);
     add(cfg.target_temp_sensor);
     add(cfg.humid_sensor);
     (Array.isArray(cfg.window_sensors) ? cfg.window_sensors : []).forEach(add);
     (Array.isArray(cfg.battery_sensors) ? cfg.battery_sensors : []).forEach(add);
+    (Array.isArray(cfg.alert_sensors) ? cfg.alert_sensors : []).forEach((s) => add(typeof s === "string" ? s : s?.entity));
     (Array.isArray(cfg.controls) ? cfg.controls : []).forEach((ctrl) => {
       add(ctrl?.entity);
       if (Array.isArray(ctrl.visibility)) {
@@ -793,12 +1004,113 @@ class OneLineRoomCard extends HTMLElement {
       attrs.current_humidity ?? "",
       attrs.friendly_name ?? "",
       attrs.hvac_action ?? "",
+      attrs.fan_mode ?? "",
       attrs.icon ?? "",
       attrs.current_position ?? "",
       attrs.color_temp ?? "",
       attrs.brightness ?? "",
       rgb
     ].join("|");
+  }
+
+  _normalizeAlertSensorConfig(cfg) {
+    if (!cfg) return null;
+    if (typeof cfg === "string") return { entity: cfg };
+    if (typeof cfg === "object") {
+      const normalized = { ...cfg };
+      if (normalized.state && typeof normalized.state === "string") {
+        normalized.state = normalized.state.split(",").map(s => String(s).toLowerCase().trim()).filter(Boolean);
+      } else if (Array.isArray(normalized.state)) {
+        normalized.state = normalized.state.map(s => String(s).toLowerCase().trim()).filter(Boolean);
+      }
+      return normalized;
+    }
+    return null;
+  }
+
+  _isAlertSensorActive(alertCfg, stateObj) {
+    if (!alertCfg || !stateObj) return false;
+    const current = String(stateObj.state).toLowerCase().trim();
+    const normalized = this._normalizeAlertSensorConfig(alertCfg);
+    if (!normalized || !normalized.entity) return false;
+    if (Array.isArray(normalized.state) && normalized.state.length > 0) {
+      return normalized.state.includes(current);
+    }
+    const numeric = Number(stateObj.state);
+    const hasNumeric = Number.isFinite(numeric);
+    const compareNumber = (value) => Number.isFinite(Number(value)) ? Number(value) : NaN;
+    const above = compareNumber(normalized.above ?? normalized.min);
+    const below = compareNumber(normalized.below ?? normalized.max);
+    if (!Number.isNaN(above) && hasNumeric && numeric > above) return true;
+    if (!Number.isNaN(below) && hasNumeric && numeric < below) return true;
+    const activeStates = ["on", "open", "true", "active", "alarm", "warning", "detected", "triggered", "problem", "motion", "error"];
+    return activeStates.includes(current);
+  }
+
+  _showAlertDialog(alerts) {
+    const dialog = document.createElement("div");
+    dialog.className = "alert-dialog-container";
+    const title = getTranslation(this._hass, "active_alerts");
+    dialog.innerHTML = `
+      <div class="alert-dialog-backdrop"></div>
+      <div class="alert-dialog">
+        <div class="alert-dialog-header">
+          <h2>${title}</h2>
+          <button class="alert-dialog-close" aria-label="Close">✕</button>
+        </div>
+        <div class="alert-dialog-content">
+          <div class="alert-entity-list">
+            ${alerts.map(a => `
+              <div class="alert-entity-row" data-entity="${a.entity_id}">
+                <ha-icon icon="${a.icon}" style="color:#FF5252!important;--mdc-icon-size:24px"></ha-icon>
+                <span class="alert-entity-name">${a.friendly_name}</span>
+                <span class="alert-entity-state">${a.state}</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+    const style = document.createElement("style");
+    style.textContent = `
+      .alert-dialog-container { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; }
+      .alert-dialog-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.5); cursor: pointer; }
+      .alert-dialog { position: relative; z-index: 10001; background: var(--ha-card-background, white); border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.3); max-height: 80vh; width: 90%; max-width: 400px; display: flex; flex-direction: column; }
+      .alert-dialog-header { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+      .alert-dialog-header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+      .alert-dialog-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--primary-text-color, #000); padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+      .alert-dialog-close:hover { background: rgba(0,0,0,0.05); border-radius: 4px; }
+      .alert-dialog-content { flex: 1; overflow-y: auto; padding: 0; }
+      .alert-entity-list { display: flex; flex-direction: column; }
+      .alert-entity-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; transition: background-color 0.15s; }
+      .alert-entity-row:last-child { border-bottom: none; }
+      .alert-entity-row:hover { background-color: rgba(0,0,0,0.03); }
+      .alert-entity-name { flex: 1; font-weight: 500; color: var(--primary-text-color); }
+      .alert-entity-state { font-size: 12px; color: var(--secondary-text-color, #888); text-transform: capitalize; }
+    `;
+    dialog.appendChild(style);
+    this.shadowRoot.appendChild(dialog);
+
+    const closeDialog = () => dialog.remove();
+    const handleEscape = (e) => {
+      if (e.key === "Escape") {
+        closeDialog();
+        document.removeEventListener("keydown", handleEscape);
+      }
+    };
+    dialog.querySelector(".alert-dialog-close").addEventListener("click", closeDialog);
+    dialog.querySelector(".alert-dialog-backdrop").addEventListener("click", closeDialog);
+    document.addEventListener("keydown", handleEscape);
+    dialog.querySelectorAll(".alert-entity-row").forEach(row => {
+      row.addEventListener("click", () => {
+        const entityId = row.dataset.entity;
+        if (entityId && this._hass) {
+          this._fireAction("more-info", { entity: entityId });
+        }
+        closeDialog();
+        document.removeEventListener("keydown", handleEscape);
+      });
+    });
   }
 
   _getRenderMetaSignature(hass) {
@@ -850,11 +1162,22 @@ class OneLineRoomCard extends HTMLElement {
     // --- NEW: DYNAMIC UNIT ---
     const unit = h.config.unit_system.temperature || "°C";
 
-    this.shadowRoot.getElementById("bg").src = c.image || "/static/images/card_media/cover.png";
+    const bgEl = this.shadowRoot.getElementById("bg");
+    bgEl.src = c.image || "/static/images/card_media/cover.png";
+    if (c.image_entity && h.states[c.image_entity]) {
+      const isOff = !isEntityActive(h.states[c.image_entity], c.image_entity);
+      bgEl.classList.toggle("grayscale", isOff);
+    } else {
+      bgEl.classList.remove("grayscale");
+    }
     const imgBox = this.shadowRoot.querySelector(".img-box");
     if (imgBox) {
       const hh = c.header_height !== undefined ? Number(c.header_height) : NaN;
-      imgBox.style.height = (Number.isFinite(hh) && hh >= 0) ? hh + "px" : "120px";
+      const hideImg = c.show_image === false;
+      if (Number.isFinite(hh) && hh >= 0) imgBox.style.height = hh + "px";
+      else if (hideImg) imgBox.style.height = "auto";
+      else imgBox.style.height = "120px";
+      imgBox.classList.toggle("no-image", hideImg);
     }
     const nameEl = this.shadowRoot.getElementById("name");
     nameEl.innerText = c.name || "Room";
@@ -983,6 +1306,49 @@ class OneLineRoomCard extends HTMLElement {
       const txt = getTranslation(h, "high_humidity");
       ch.innerHTML += `<div class="chip humidity"><ha-icon icon="mdi:water-alert" style="--mdc-icon-size:14px"></ha-icon> ${txt}</div>`;
     }
+    if (c.presence_sensor && h.states[c.presence_sensor]) {
+      const pState = h.states[c.presence_sensor];
+      const isActive = ["on", "home", "active", "detected"].includes(String(pState.state).toLowerCase().trim());
+      if (isActive) {
+        const pLabel = pState.attributes?.friendly_name || getTranslation(h, "presence_detected");
+        const isPerson = String(pState.entity_id).startsWith("person.");
+        const pIcon = pState.attributes?.icon || (isPerson ? "mdi:account" : "mdi:motion-sensor");
+        ch.innerHTML += `<div class="chip" style="background: rgba(76, 175, 80, 0.15); color: #4CAF50;"><ha-icon icon="${pIcon}" style="--mdc-icon-size:14px"></ha-icon> ${pLabel}</div>`;
+      }
+    }
+    const effectiveAlertSensors = Array.isArray(c.alert_sensors) ? c.alert_sensors : [];
+    const normalizedAlertSensors = effectiveAlertSensors
+      .map(s => this._normalizeAlertSensorConfig(s))
+      .filter(Boolean);
+    let alertSensorWarn = false;
+    const activeAlerts = [];
+    normalizedAlertSensors.forEach(cfg => {
+      const st = h.states[cfg.entity];
+      if (!st) return;
+      if (this._isAlertSensorActive(cfg, st)) {
+        alertSensorWarn = true;
+        activeAlerts.push({
+          entity_id: cfg.entity,
+          friendly_name: st.attributes?.friendly_name || cfg.entity,
+          icon: st.attributes?.icon || "mdi:alert-circle-outline",
+          state: st.state
+        });
+      }
+    });
+    const alertChipMode = c.alert_chip_mode || "expanded";
+    if (alertChipMode === "collapsed" && activeAlerts.length > 0) {
+      const chip = document.createElement("div");
+      chip.className = "chip alert";
+      chip.innerHTML = `<ha-icon icon="mdi:alert" style="--mdc-icon-size:14px"></ha-icon> ${activeAlerts.length}`;
+      chip.style.cursor = "pointer";
+      chip.addEventListener("click", () => this._showAlertDialog(activeAlerts));
+      ch.appendChild(chip);
+    } else if (alertChipMode === "expanded" && activeAlerts.length > 0) {
+      activeAlerts.forEach(alert => {
+        ch.innerHTML += `<div class="chip alert"><ha-icon icon="${alert.icon}" style="--mdc-icon-size:14px"></ha-icon> ${alert.friendly_name}</div>`;
+      });
+    }
+
     const windowAlwaysShow = c.window_always_show === true;
     const windowOpenColor = trimStr(c.window_open_color) || "#FFA000";
     const windowClosedColor = trimStr(c.window_closed_color) || "#9E9E9E";
@@ -1012,6 +1378,9 @@ class OneLineRoomCard extends HTMLElement {
     if (cardEl) {
       cardEl.classList.toggle("warning-battery", batteryWarn);
       cardEl.classList.toggle("warning-humidity", !batteryWarn && humidityWarn);
+      cardEl.classList.toggle("alert-sensor", !batteryWarn && !humidityWarn && alertSensorWarn);
+      if (trimStr(c.alert_border_color)) cardEl.style.setProperty("--rc-alert-border-color", trimStr(c.alert_border_color));
+      else cardEl.style.removeProperty("--rc-alert-border-color");
 
       const setPxProp = (k, v, def) => {
         if (v !== undefined && v !== null && v !== "") {
@@ -1484,6 +1853,8 @@ class OneLineRoomCard extends HTMLElement {
     btn.style.setProperty("--icon-color", col);
     btn.style.setProperty("--btn-bg", bg);
 
+    this._renderBtnSparkline(btn, ctrl, col);
+
     // Inline controls
     const controlMode = ctrl.control_mode;
     const sliderCaps = this._getSliderCapabilities(domain, st, ctrl);
@@ -1837,6 +2208,61 @@ class OneLineRoomCard extends HTMLElement {
           presetsDiv.appendChild(pb);
         });
         btn.appendChild(presetsDiv);
+      }
+
+      // Climate HVAC mode chips
+      if (domain === "climate" && ctrl.show_hvac_modes === true) {
+        const modes = Array.isArray(st?.attributes?.hvac_modes) ? st.attributes.hvac_modes : [];
+        if (modes.length > 0) {
+          const current = String(st?.state || "").toLowerCase();
+          const div = document.createElement("div");
+          div.className = "btn-cover-presets";
+          const iconForMode = {
+            off: "mdi:power", auto: "mdi:thermostat-auto", heat: "mdi:fire", cool: "mdi:snowflake",
+            heat_cool: "mdi:sun-snowflake", dry: "mdi:water-percent", fan_only: "mdi:fan"
+          };
+          modes.forEach(mode => {
+            const pb = document.createElement("div");
+            pb.className = "preset-btn";
+            const ic = iconForMode[String(mode).toLowerCase()];
+            pb.innerHTML = ic ? `<ha-icon icon="${ic}" style="--mdc-icon-size:14px"></ha-icon> ${mode}` : mode;
+            if (String(mode).toLowerCase() === current) pb.classList.add("active");
+            pb.addEventListener("pointerdown", e => e.stopPropagation());
+            pb.addEventListener("click", e => {
+              e.stopPropagation();
+              if (!this._isEntityUnavailable(ctrl.entity)) {
+                this._hass.callService("climate", "set_hvac_mode", { entity_id: ctrl.entity, hvac_mode: mode });
+              }
+            });
+            div.appendChild(pb);
+          });
+          btn.appendChild(div);
+        }
+      }
+
+      // Climate fan mode chips
+      if (domain === "climate" && ctrl.show_fan_modes === true) {
+        const modes = Array.isArray(st?.attributes?.fan_modes) ? st.attributes.fan_modes : [];
+        if (modes.length > 0) {
+          const current = String(st?.attributes?.fan_mode || "").toLowerCase();
+          const div = document.createElement("div");
+          div.className = "btn-cover-presets";
+          modes.forEach(mode => {
+            const pb = document.createElement("div");
+            pb.className = "preset-btn";
+            pb.innerHTML = `<ha-icon icon="mdi:fan" style="--mdc-icon-size:14px"></ha-icon> ${mode}`;
+            if (String(mode).toLowerCase() === current) pb.classList.add("active");
+            pb.addEventListener("pointerdown", e => e.stopPropagation());
+            pb.addEventListener("click", e => {
+              e.stopPropagation();
+              if (!this._isEntityUnavailable(ctrl.entity)) {
+                this._hass.callService("climate", "set_fan_mode", { entity_id: ctrl.entity, fan_mode: mode });
+              }
+            });
+            div.appendChild(pb);
+          });
+          btn.appendChild(div);
+        }
       }
 
       // Light brightness presets
@@ -2202,6 +2628,8 @@ class OneLineRoomCardEditor extends HTMLElement {
     this._actionsSectionOpen = false;
     this._headerSectionOpen = true;
     this._layoutSectionOpen = false;
+    this._areaSelectorOpen = false;
+    this._selectedArea = "";
     this._activeTab = "config";
     this._controlIds = [];
     this._nextControlId = 1;
@@ -2577,6 +3005,129 @@ connectedCallback() {
     };
   }
 
+  async _getAreaEntities(areaId) {
+    if (!this._hass || !areaId) return [];
+    try {
+      const devices = await this._hass.callWS({ type: "config/device_registry/list" });
+      const areaDevices = (Array.isArray(devices) ? devices : []).filter(
+        (d) => d.area_id === areaId && !d.disabled_by
+      );
+      const deviceIds = new Set(areaDevices.map(d => d.id));
+      const entries = await this._hass.callWS({ type: "config/entity_registry/list" });
+      return (Array.isArray(entries) ? entries : []).filter(
+        (e) => !e.disabled_by && (e.area_id === areaId || deviceIds.has(e.device_id))
+      );
+    } catch (err) {
+      console.error("Error fetching area entities:", err);
+      return [];
+    }
+  }
+
+  _findFirstEntityByDomain(entities, domain) {
+    if (!Array.isArray(entities)) return null;
+    return entities.find(e => e.entity_id?.startsWith(`${domain}.`)) || null;
+  }
+
+  _groupEntitiesByDomain(entities) {
+    const grouped = {};
+    (Array.isArray(entities) ? entities : []).forEach(e => {
+      const domain = e.entity_id?.split(".")?.[0];
+      if (!domain) return;
+      if (!grouped[domain]) grouped[domain] = [];
+      grouped[domain].push(e);
+    });
+    return grouped;
+  }
+
+  _buildControlsFromEntities(entitiesByDomain) {
+    if (!entitiesByDomain || typeof entitiesByDomain !== "object") return [];
+    const preferredDomainOrder = ["light", "switch", "cover", "fan", "media_player", "lock"];
+    const controls = [];
+    for (const domain of preferredDomainOrder) {
+      for (const entity of entitiesByDomain[domain] || []) {
+        const template = this._getTemplateById(domain);
+        if (template) {
+          const control = this._buildControlFromTemplate(template, entity.entity_id);
+          if (control) controls.push(control);
+        }
+      }
+    }
+    return controls;
+  }
+
+  _resolveTemperatureSensor(climateEntity, entities) {
+    if (!Array.isArray(entities)) return null;
+    const tempSensors = entities.filter(e =>
+      (e.entity_id?.startsWith("sensor.") || e.entity_id?.startsWith("input_number.")) &&
+      (e.device_class === "temperature" || e.entity_id?.toLowerCase().includes("temp"))
+    );
+    return tempSensors[0] || null;
+  }
+
+  _resolveHumiditySensor(climateEntity, entities) {
+    if (!Array.isArray(entities)) return null;
+    const humidSensors = entities.filter(e =>
+      (e.entity_id?.startsWith("sensor.") || e.entity_id?.startsWith("input_number.")) &&
+      (e.device_class === "humidity" || e.entity_id?.toLowerCase().includes("humid"))
+    );
+    return humidSensors[0] || null;
+  }
+
+  _findSensorsByDeviceClass(entities, deviceClasses, domains = ["binary_sensor", "sensor"]) {
+    if (!Array.isArray(entities) || !Array.isArray(deviceClasses)) return [];
+    return entities
+      .filter(e => {
+        const eDomain = e.entity_id?.split(".")?.[0];
+        return domains.includes(eDomain) && deviceClasses.includes(e.device_class);
+      })
+      .map(e => e.entity_id);
+  }
+
+  async _generateFromArea(areaId) {
+    if (!areaId || !this._hass) return;
+    try {
+      const entities = await this._getAreaEntities(areaId);
+      if (!entities || entities.length === 0) {
+        console.warn(getTranslation(this._hass, "area_no_entities"));
+        return;
+      }
+      const climateEntity = this._findFirstEntityByDomain(entities, "climate");
+      const entitiesByDomain = this._groupEntitiesByDomain(entities);
+      const controls = this._buildControlsFromEntities(entitiesByDomain);
+      const tempSensor = this._resolveTemperatureSensor(climateEntity, entities);
+      const humidSensor = this._resolveHumiditySensor(climateEntity, entities);
+      const windowSensors = this._findSensorsByDeviceClass(entities, ["window", "door"]);
+      const batterySensors = this._findSensorsByDeviceClass(entities, ["battery"]);
+      const newConfig = {
+        ...this._config,
+        entity: climateEntity?.entity_id || (this._config.entity || ""),
+        temp_sensor: tempSensor?.entity_id || (this._config.temp_sensor || ""),
+        humid_sensor: humidSensor?.entity_id || (this._config.humid_sensor || ""),
+        window_sensors: windowSensors.length > 0 ? windowSensors : (this._config.window_sensors || []),
+        battery_sensors: batterySensors.length > 0 ? batterySensors : (this._config.battery_sensors || []),
+        controls: [...(this._config.controls || []), ...controls]
+      };
+      this._fire(newConfig);
+    } catch (err) {
+      console.error("Error generating from area:", err);
+    }
+  }
+
+  _ensureAreaOptions() {
+    const areaPicker = this.shadowRoot?.getElementById("area-picker");
+    if (!areaPicker) return;
+    areaPicker.hass = this._hass;
+    if (!areaPicker.selector) areaPicker.selector = { area: {} };
+  }
+
+  _updateAreaSetupUI() {
+    const content = this.shadowRoot?.getElementById("area-setup-content");
+    const chev = this.shadowRoot?.getElementById("area-setup-chev");
+    if (content) content.hidden = !this._areaSelectorOpen;
+    if (chev) chev.style.transform = this._areaSelectorOpen ? "rotate(90deg)" : "";
+    if (this._areaSelectorOpen) this._ensureAreaOptions();
+  }
+
   _iconForEntity(entityId) {
     if (!this._hass || !entityId) return "mdi:help-circle-outline";
     const st = this._hass.states[entityId];
@@ -2677,7 +3228,7 @@ connectedCallback() {
     if (!this._config) return;
     const alreadyRendered = !!this.shadowRoot.innerHTML;
     const domVersion = this.shadowRoot.querySelector("[data-rc-version]")?.dataset?.rcVersion;
-    if (alreadyRendered && domVersion === VERSION) { this.updVal(); if (JSON.stringify(this._config?.controls || []) !== this._lastRenderedControlsSig) this.renBtn(); this._applyNavSelectorOptions(); this._ensureNavOptions(); this._updateSensorsSectionUI(); this._updateImageSectionUI(); this._updateBadgesUI(); this._updateTypographyUI(); this._updateCardBehaviorUI(); this._updateActionsSectionUI(); this._updateHeaderSectionUI(); this._updateTabUI(); return; }
+    if (alreadyRendered && domVersion === VERSION) { this.updVal(); if (JSON.stringify(this._config?.controls || []) !== this._lastRenderedControlsSig) this.renBtn(); this._applyNavSelectorOptions(); this._ensureNavOptions(); this._ensureAreaOptions(); this._updateAreaSetupUI(); this._updateSensorsSectionUI(); this._updateImageSectionUI(); this._updateBadgesUI(); this._updateTypographyUI(); this._updateCardBehaviorUI(); this._updateActionsSectionUI(); this._updateHeaderSectionUI(); this._updateTabUI(); return; }
     
     this.shadowRoot.innerHTML = "";
     const h = this._hass;
@@ -2787,6 +3338,26 @@ connectedCallback() {
         <button id="tab-buttons-btn" class="tab-btn">${getTranslation(h, "buttons")}</button>
       </div>
       <div id="tab-config-panel">
+      <div class="sec">
+        <div id="area-setup-head" class="sec-head" style="cursor:pointer;user-select:none;padding:4px 0">
+          <h3>${getTranslation(h, "area_setup")}</h3>
+          <ha-icon id="area-setup-chev" icon="mdi:chevron-right" style="--mdc-icon-size:18px;opacity:0.7;transition:transform 0.15s ease"></ha-icon>
+        </div>
+        <div id="area-setup-content" hidden>
+          <div style="margin-bottom: 12px; font-size: 12px; opacity: 0.7;">
+            ${getTranslation(h, "area_setup_desc")}
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-end; margin-bottom: 12px;">
+            <div style="flex: 1; min-width: 200px;">
+              <ha-selector id="area-picker" label="${getTranslation(h, "area_picker")}"></ha-selector>
+            </div>
+            <mwc-button id="area-generate" raised>
+              <ha-icon icon="mdi:plus" slot="icon"></ha-icon>
+              ${getTranslation(h, "area_generate")}
+            </mwc-button>
+          </div>
+        </div>
+      </div>
       <div class="sec">
         <div id="card-beh-head" class="sec-head" style="cursor:pointer;user-select:none;padding:4px 0">
           <h3>${getTranslation(h, "card_behavior")}</h3>
@@ -2915,7 +3486,12 @@ connectedCallback() {
           </div>
           <div id="image-content" class="image-content" hidden>
             <img id="prev-img" class="preview">
+            <ha-formfield label="${getTranslation(h, "show_image")}" style="display:flex;align-items:center;margin-bottom:8px">
+              <ha-switch id="show-image-toggle"></ha-switch>
+            </ha-formfield>
             <ha-textfield id="img-url-field" cfg="image" class="i" icon="mdi:image"></ha-textfield>
+            <ha-entity-picker label="${getTranslation(h, "image_entity")}" cfg="image_entity" class="i" allow-custom-entity include-domains='["light", "switch", "input_boolean", "group"]' style="margin-top: 8px;"></ha-entity-picker>
+            <div style="font-size:11px;opacity:0.7;margin-top:4px">${getTranslation(h, "image_entity_help")}</div>
             <div class="upload-row">
               <input type="file" id="file-upload" class="upload-hidden" accept="image/*">
               <mwc-button id="upload-btn" raised label="${getTranslation(h, "upload_btn")}">
@@ -3023,6 +3599,7 @@ connectedCallback() {
           </div>
           <div id="sensors-content" class="manual-content" hidden>
             <div class="image-title" style="font-size:11px;font-weight:600;opacity:0.6;margin-bottom:6px">${getTranslation(h, "sensors_manual")}</div>
+            <ha-entity-picker label="${getTranslation(h, "presence_sensor")}" cfg="presence_sensor" class="i" allow-custom-entity include-domains='["person", "binary_sensor", "device_tracker"]'></ha-entity-picker>
             <ha-entity-picker label="${getTranslation(h, "temp_label")}" cfg="temp_sensor" class="i" allow-custom-entity></ha-entity-picker>
             <ha-entity-picker label="${getTranslation(h, "target_temp_label")}" cfg="target_temp_sensor" class="i" allow-custom-entity></ha-entity-picker>
             <ha-entity-picker label="${getTranslation(h, "humid_label")}" cfg="humid_sensor" class="i" allow-custom-entity></ha-entity-picker>
@@ -3064,6 +3641,20 @@ connectedCallback() {
               <mwc-button id="window-state-colors-add" raised label="${getTranslation(h, "window_state_colors_add")}">
                 <ha-icon icon="mdi:plus" slot="icon"></ha-icon>
               </mwc-button>
+            </div>
+            <div id="alert-sensors-section" style="margin-top:8px">
+              <div class="image-title" style="font-size:11px;font-weight:600;opacity:0.6;margin-bottom:6px">${getTranslation(h, "alert_sensors")}</div>
+              <div id="alert-sensors-list"></div>
+              <mwc-button id="alert-sensors-add" raised label="${getTranslation(h, "alert_sensor_add")}">
+                <ha-icon icon="mdi:plus" slot="icon"></ha-icon>
+              </mwc-button>
+              <div style="margin-top:12px;padding:8px;background:rgba(0,0,0,0.1);border-radius:6px;display:flex;align-items:center;justify-content:space-between">
+                <div style="font-size:12px;font-weight:500">${getTranslation(h, "alert_chip_collapsed")}</div>
+                <ha-switch id="alert-chip-mode-toggle"></ha-switch>
+              </div>
+              <div style="margin-top:8px">
+                <ha-textfield label="${getTranslation(h, "alert_border_color")}" id="alert-border-color" cfg="alert_border_color" class="i" placeholder="#d32f2d" style="width:100%"></ha-textfield>
+              </div>
             </div>
             <div style="border-top:1px solid var(--divider-color);margin:10px 0 8px"></div>
             <div class="image-title" style="font-size:11px;font-weight:600;opacity:0.6;margin-bottom:6px">${getTranslation(h, "battery_label")}</div>
@@ -3158,6 +3749,32 @@ connectedCallback() {
       uploadBtn.addEventListener("click", () => fileInput.click());
       fileInput.addEventListener("change", (e) => this._handleUpload(e));
     }
+    const areaSetupHead = this.shadowRoot.getElementById("area-setup-head");
+    if (areaSetupHead) {
+      areaSetupHead.addEventListener("click", () => {
+        this._areaSelectorOpen = !this._areaSelectorOpen;
+        this._updateAreaSetupUI();
+      });
+    }
+    const areaPicker = this.shadowRoot.getElementById("area-picker");
+    if (areaPicker) {
+      areaPicker.hass = this._hass;
+      areaPicker.selector = { area: {} };
+      areaPicker.value = this._selectedArea || "";
+      areaPicker.addEventListener("value-changed", (e) => {
+        e.stopPropagation();
+        this._selectedArea = e.detail?.value || "";
+      });
+    }
+    const areaGenerateBtn = this.shadowRoot.getElementById("area-generate");
+    if (areaGenerateBtn) {
+      areaGenerateBtn.addEventListener("click", async () => {
+        const ap = this.shadowRoot.getElementById("area-picker");
+        const area = ap?.value || this._selectedArea;
+        if (area) await this._generateFromArea(area);
+      });
+    }
+    this._updateAreaSetupUI();
     const cardBehHead = this.shadowRoot.getElementById("card-beh-head");
     if (cardBehHead) {
       cardBehHead.addEventListener("click", () => {
@@ -3444,6 +4061,141 @@ connectedCallback() {
         renderWindowStateColors();
       });
     }
+    const renderAlertSensors = (sourceInput) => {
+      const list = this.shadowRoot.getElementById("alert-sensors-list");
+      if (!list) return;
+      list.innerHTML = "";
+      const source = Array.isArray(sourceInput)
+        ? sourceInput
+        : (Array.isArray(this._config?.alert_sensors) ? this._config.alert_sensors : []);
+      const normalize = (cfg) => {
+        if (!cfg) return null;
+        if (typeof cfg === "string") return { entity: cfg };
+        if (typeof cfg === "object") {
+          const n = { ...cfg };
+          if (n.state && typeof n.state === "string") {
+            n.state = n.state.split(",").map(s => String(s).toLowerCase().trim()).filter(Boolean);
+          } else if (Array.isArray(n.state)) {
+            n.state = n.state.map(s => String(s).toLowerCase().trim()).filter(Boolean);
+          }
+          return n;
+        }
+        return null;
+      };
+      const fireUpdate = (arr) => {
+        const next = { ...this._config };
+        if (arr.length > 0) next.alert_sensors = arr; else delete next.alert_sensors;
+        this._fire(next);
+      };
+      source.forEach((item, idx) => {
+        const cfg = normalize(item) || { entity: "" };
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;";
+        const headerRow = document.createElement("div");
+        headerRow.className = "badge-head-row";
+        const entityLabel = document.createElement("span");
+        entityLabel.className = "badge-entity-label";
+        entityLabel.textContent = cfg.entity
+          ? (h.states[cfg.entity]?.attributes?.friendly_name || cfg.entity)
+          : getTranslation(h, "alert_sensor_entity");
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "badge-del-btn";
+        deleteBtn.innerHTML = `<ha-icon icon="mdi:delete-outline"></ha-icon>`;
+        deleteBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          const arr = [...(this._config?.alert_sensors || [])];
+          arr.splice(idx, 1);
+          fireUpdate(arr);
+          renderAlertSensors();
+        });
+        headerRow.appendChild(entityLabel);
+        headerRow.appendChild(deleteBtn);
+        row.appendChild(headerRow);
+
+        const entityPicker = document.createElement("ha-entity-picker");
+        entityPicker.label = getTranslation(h, "alert_sensor_entity");
+        entityPicker.allowCustomEntity = true;
+        entityPicker.selector = { entity: { domain: ["binary_sensor", "sensor"] } };
+        entityPicker.hass = h;
+        entityPicker.value = cfg.entity || "";
+        entityPicker.style.cssText = "flex:1 1 220px;min-width:200px;";
+        entityPicker.addEventListener("value-changed", (ev) => {
+          ev.stopPropagation();
+          const arr = [...(this._config?.alert_sensors || [])];
+          arr[idx] = { ...cfg, entity: ev.detail?.value || "" };
+          fireUpdate(arr);
+          renderAlertSensors();
+        });
+
+        const mkNumField = (key, labelKey) => {
+          const f = document.createElement("ha-textfield");
+          f.label = getTranslation(h, labelKey);
+          f.type = "number";
+          f.value = cfg[key] !== undefined ? String(cfg[key]) : "";
+          f.style.cssText = "flex:1 1 120px;min-width:100px;";
+          f.addEventListener("change", (ev) => {
+            ev.stopPropagation();
+            const val = trimStr(ev.target.value || "");
+            const arr = [...(this._config?.alert_sensors || [])];
+            const next = { ...cfg };
+            if (val === "") delete next[key]; else next[key] = Number(val);
+            arr[idx] = next;
+            fireUpdate(arr);
+          });
+          return f;
+        };
+        const aboveField = mkNumField("above", "alert_sensor_above");
+        const belowField = mkNumField("below", "alert_sensor_below");
+
+        const stateField = document.createElement("ha-textfield");
+        stateField.label = getTranslation(h, "alert_sensor_state");
+        stateField.value = Array.isArray(cfg.state) ? cfg.state.join(", ") : (cfg.state || "");
+        stateField.style.cssText = "flex:1 1 120px;min-width:100px;";
+        stateField.addEventListener("change", (ev) => {
+          ev.stopPropagation();
+          const raw = trimStr(ev.target.value || "");
+          const arr = [...(this._config?.alert_sensors || [])];
+          const next = { ...cfg };
+          if (raw === "") delete next.state;
+          else next.state = raw.split(",").map(s => s.trim()).filter(Boolean);
+          arr[idx] = next;
+          fireUpdate(arr);
+        });
+
+        const controlsRow = document.createElement("div");
+        controlsRow.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;width:100%;";
+        controlsRow.appendChild(aboveField);
+        controlsRow.appendChild(belowField);
+        controlsRow.appendChild(stateField);
+        row.appendChild(entityPicker);
+        row.appendChild(controlsRow);
+        list.appendChild(row);
+      });
+    };
+    renderAlertSensors();
+    const alertSensorsAddBtn = this.shadowRoot.getElementById("alert-sensors-add");
+    if (alertSensorsAddBtn) {
+      alertSensorsAddBtn.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const arr = [...(this._config?.alert_sensors || [])];
+        arr.push({ entity: "" });
+        this._fire({ ...this._config, alert_sensors: arr });
+        renderAlertSensors(arr);
+      });
+    }
+    const alertChipModeToggle = this.shadowRoot.getElementById("alert-chip-mode-toggle");
+    if (alertChipModeToggle) {
+      alertChipModeToggle.checked = this._config?.alert_chip_mode === "collapsed";
+      alertChipModeToggle.addEventListener("change", (e) => {
+        const next = { ...this._config };
+        if (e.target.checked) next.alert_chip_mode = "collapsed";
+        else delete next.alert_chip_mode;
+        this._fire(next);
+      });
+    }
+
     const badgesHead = this.shadowRoot.getElementById("badges-head");
     if (badgesHead) {
       badgesHead.addEventListener("click", () => {
@@ -3849,6 +4601,17 @@ const updateActionFields = (action, serviceField, serviceDataField, targetField,
       showNameToggle.addEventListener("change", (ev) => {
         ev.stopPropagation();
         this._fire({ ...this._config, show_name: ev.target.checked !== false });
+      });
+    }
+    const showImageToggle = this.shadowRoot.getElementById("show-image-toggle");
+    if (showImageToggle) {
+      showImageToggle.checked = this._config?.show_image !== false;
+      showImageToggle.addEventListener("change", (ev) => {
+        ev.stopPropagation();
+        const next = { ...this._config };
+        if (ev.target.checked === false) next.show_image = false;
+        else delete next.show_image;
+        this._fire(next);
       });
     }
     
@@ -4592,7 +5355,7 @@ if (tmplSelect) {
           <ha-textfield class="ts" label="${getTranslation(h, "tmpl_state")}"></ha-textfield>
           <div class="tmpl-preview"><span>${getTranslation(h, "tmpl_preview")}:</span> <ha-icon class="tp-ic"></ha-icon> <span class="tp-tx"></span></div>
         </details>
-        <div class="row" style="margin-top:8px; align-items:center"><ha-selector class="al" label="${getTranslation(h, "align")}"></ha-selector><ha-selector class="lp" label="${getTranslation(h, "label_position")}"></ha-selector><ha-selector class="tl" label="${getTranslation(h, "text_layout")}"></ha-selector><ha-formfield label="${getTranslation(h, "show_state")}"><ha-switch class="ss" checked></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_label")}"><ha-switch class="sl" checked></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_icon")}"><ha-switch class="si" checked></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_last_changed")}"><ha-switch class="slc"></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "visible")}"><ha-switch class="hd" checked></ha-switch></ha-formfield></div>
+        <div class="row" style="margin-top:8px; align-items:center"><ha-selector class="al" label="${getTranslation(h, "align")}"></ha-selector><ha-selector class="lp" label="${getTranslation(h, "label_position")}"></ha-selector><ha-selector class="tl" label="${getTranslation(h, "text_layout")}"></ha-selector><ha-formfield label="${getTranslation(h, "show_state")}"><ha-switch class="ss" checked></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_label")}"><ha-switch class="sl" checked></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_icon")}"><ha-switch class="si" checked></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_last_changed")}"><ha-switch class="slc"></ha-switch></ha-formfield><ha-formfield label="${getTranslation(h, "show_sparkline")}"><ha-switch class="sps"></ha-switch></ha-formfield><ha-textfield class="sh" label="${getTranslation(h, "sparkline_hours")}" type="number" placeholder="24" style="max-width:120px"></ha-textfield><ha-formfield label="${getTranslation(h, "visible")}"><ha-switch class="hd" checked></ha-switch></ha-formfield></div>
         <div class="entity-only ${hideEntity}" style="margin-top:12px; border-top:1px solid var(--divider-color); padding-top:12px">
            <ha-textfield class="isz" label="${getTranslation(h, "icon_size")}" type="number" style="max-width:120px" placeholder="20"></ha-textfield>
            <ha-selector class="cm" label="${getTranslation(h, "control_mode")}"></ha-selector>
@@ -4617,6 +5380,10 @@ if (tmplSelect) {
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <ha-formfield label="${getTranslation(h, "show_climate_presets")}"><ha-switch class="sctp"></ha-switch></ha-formfield>
             <ha-textfield class="ctpv" label="${getTranslation(h, "climate_presets_label")}" placeholder="0, 18, 20, auto, max" style="flex:1;min-width:160px"></ha-textfield>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <ha-formfield label="${getTranslation(h, "show_hvac_modes")}"><ha-switch class="shvac"></ha-switch></ha-formfield>
+            <ha-formfield label="${getTranslation(h, "show_fan_modes")}"><ha-switch class="sfan"></ha-switch></ha-formfield>
           </div>
         </div>
         <div class="entity-only light-only ${hideEntity}" style="margin-top:8px; border-top:1px solid var(--divider-color); padding-top:8px">
@@ -4934,8 +5701,30 @@ if (tmplSelect) {
             c[i] = next; keepOpen(); this._fire({ ...this._config, controls: c });
           });
         }
+        const shvac = climateOnly.querySelector(".shvac");
+        if (shvac) {
+          shvac.checked = ctrl.show_hvac_modes === true;
+          shvac.addEventListener("change", e => {
+            e.stopPropagation();
+            const c = [...this._config.controls];
+            const next = { ...c[i] };
+            if (e.target.checked) next.show_hvac_modes = true; else delete next.show_hvac_modes;
+            c[i] = next; keepOpen(); this._fire({ ...this._config, controls: c });
+          });
+        }
+        const sfan = climateOnly.querySelector(".sfan");
+        if (sfan) {
+          sfan.checked = ctrl.show_fan_modes === true;
+          sfan.addEventListener("change", e => {
+            e.stopPropagation();
+            const c = [...this._config.controls];
+            const next = { ...c[i] };
+            if (e.target.checked) next.show_fan_modes = true; else delete next.show_fan_modes;
+            c[i] = next; keepOpen(); this._fire({ ...this._config, controls: c });
+          });
+        }
       }
-      
+
       const lightOnly = box.querySelector(".light-only");
       if (lightOnly) {
         lightOnly.hidden = ctrlDomain !== "light";
@@ -5305,6 +6094,20 @@ const tl = box.querySelector(".tl");
       const sl = box.querySelector(".sl"); sl.checked = ctrl.show_label !== false; sl.addEventListener("change", e => { e.stopPropagation(); upd("show_label", e.target.checked); });
       const si = box.querySelector(".si"); si.checked = ctrl.show_icon !== false; si.addEventListener("change", e => { e.stopPropagation(); upd("show_icon", e.target.checked); });
       const slc = box.querySelector(".slc"); if (slc) { slc.checked = ctrl.show_last_changed === true; slc.addEventListener("change", e => { e.stopPropagation(); upd("show_last_changed", e.target.checked); }); }
+      const sps = box.querySelector(".sps");
+      if (sps) {
+        sps.checked = ctrl.show_sparkline === true;
+        sps.addEventListener("change", e => { e.stopPropagation(); upd("show_sparkline", e.target.checked === true ? true : undefined); });
+      }
+      const sh = box.querySelector(".sh");
+      if (sh) {
+        sh.value = ctrl.sparkline_hours || "";
+        sh.addEventListener("change", e => {
+          e.stopPropagation();
+          const num = parseFloat(e.target.value);
+          upd("sparkline_hours", (Number.isFinite(num) && num > 0) ? Math.round(num) : undefined);
+        });
+      }
       const hd = box.querySelector(".hd"); hd.checked = !ctrl.hide; hd.addEventListener("change", e => { e.stopPropagation(); upd("hide", !e.target.checked); });
       const tap = box.querySelector(".tap");
       const tapNav = box.querySelector(".tap-nav");
