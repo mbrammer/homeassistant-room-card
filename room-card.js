@@ -1,4 +1,4 @@
-const VERSION = "2.0.0";
+const VERSION = "2.1.0";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -59,6 +59,7 @@ const TRANSLATIONS = {
     image_position_label: "Visible area (drag preview)", image_position_help: "Drag on the preview to choose which part of the image stays visible.", image_position_reset: "Center",
     status_border: "Status border & glow", status_border_help: "Show a colored border/glow on humidity, battery or alert warnings.",
     room_name: "Room name", sparkline_refresh_label: "Sparkline refresh (sec)", users_label: "Restrict to users (optional)",
+    room_preset: "Room", room_custom: "Custom (own image)", room_preset_hint: "Uses {path} — place the file there (in /config/www/...).",
     show_name: "Show Title", header_badges: "Badge", badge_add: "Add Info Entry", badge_label: "Label (optional)", badge_background: "Background (rgba)", standard_badge_background: "Standard Badge Background (rgba)", badge_auto_climate_btn: "Automatically add climate control button",
     visibility: "Visibility", visibility_cond: "Conditional Visibility", vis_entity: "Condition Entity", vis_state: "Show if state is", vis_invert: "Invert Logic (Hide if state corresponds)",
     migration_title: "Action Required",
@@ -149,6 +150,7 @@ const TRANSLATIONS = {
     image_position_label: "Sichtbarer Bereich (Vorschau ziehen)", image_position_help: "Auf der Vorschau ziehen, um festzulegen welcher Bildausschnitt sichtbar bleibt.", image_position_reset: "Zentrieren",
     status_border: "Status-Rahmen & Glow", status_border_help: "Farbigen Rahmen/Glow bei Feuchte-, Batterie- oder Alarm-Warnungen anzeigen.",
     room_name: "Raumname", sparkline_refresh_label: "Sparkline-Aktualisierung (Sek.)", users_label: "Auf Benutzer beschränken (optional)",
+    room_preset: "Raum", room_custom: "Eigenes Bild (Custom)", room_preset_hint: "Nutzt {path} — Datei dort ablegen (in /config/www/...).",
     show_name: "Titel anzeigen", header_badges: "Badge", badge_add: "Info-Eintrag hinzufügen", badge_label: "Bezeichnung (optional)", badge_background: "Hintergrund (rgba)", standard_badge_background: "Standard Badge Hintergrund (rgba)", badge_auto_climate_btn: "Klima-Steuerungs-Button automatisch hinzufügen",
     visibility: "Sichtbarkeit", visibility_cond: "Bedingte Sichtbarkeit", vis_entity: "Bedingungs-Entität", vis_state: "Anzeigen falls Status gleich", vis_invert: "Logik umkehren (Ausblenden falls entsprechend)",
     migration_title: "Handlung erforderlich",
@@ -289,6 +291,34 @@ const getTranslation = (hass, key) => {
 const clampNum = (v, min, max, fallback) => {
   const n = Number(v);
   return Number.isFinite(n) ? Math.max(min, Math.min(n, max)) : fallback;
+};
+
+// Prepared room images. Files are expected in HA's www folder:
+//   /config/www/room-card/<value>.jpg  ->  served at /local/room-card/<value>.jpg
+// First entry (living_room) is the default selection. "custom" lets the user
+// upload / link their own image (handled separately in the editor).
+const ROOM_IMAGE_BASE = "/local/room-card/";
+const ROOM_PRESETS = [
+  { value: "living_room", label: "Living Room" },
+  { value: "kitchen", label: "Kitchen" },
+  { value: "bedroom", label: "Bedroom" },
+  { value: "bathroom", label: "Bathroom" },
+  { value: "dining_room", label: "Dining Room" },
+  { value: "office", label: "Office" },
+  { value: "kids_room", label: "Kids Room" },
+  { value: "hallway", label: "Hallway" },
+  { value: "guest_room", label: "Guest Room" },
+  { value: "garage", label: "Garage" },
+  { value: "garden", label: "Garden" },
+  { value: "balcony", label: "Balcony" },
+  { value: "basement", label: "Basement" },
+  { value: "laundry_room", label: "Laundry Room" },
+];
+const roomPresetImage = (cfg) => {
+  const base = (cfg && typeof cfg.room_image_base === "string" && cfg.room_image_base.trim()) || ROOM_IMAGE_BASE;
+  const slug = cfg && cfg.room_preset;
+  if (!slug || slug === "custom") return null;
+  return base.replace(/\/?$/, "/") + slug + ".jpg";
 };
 
 const replaceTemplateExpressions = (str, evalExpr) => {
@@ -813,7 +843,7 @@ class OneLineRoomCard extends HTMLElement {
   }
 
   static getStubConfig(hass) {
-    return { name: "", entity: "", collapsible: true, controls: [] };
+    return { name: "", entity: "", collapsible: true, controls: [], room_preset: "living_room" };
   }
 
   render() {
@@ -913,6 +943,8 @@ class OneLineRoomCard extends HTMLElement {
         .media-control-bar .btn-slider-wrap { flex: 1; min-width: 0; padding: 0; }
         .media-control-bar .btn-slider { height: 4px; }
         .media-control-bar .vol-label { font-size: 10px; font-weight: 600; color: var(--secondary-text-color); min-width: 28px; text-align: center; flex: 0 0 auto; }
+        .media-transport-bar { gap: 8px; padding-bottom: 0; }
+        .media-volume-bar { padding-top: 0; }
         .media-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
         .media-full-layout { display: flex; gap: 10px; width: 100%; align-items: stretch; }
         .media-full-layout .media-thumb { width: 56px; height: auto; min-height: 56px; border-radius: 6px; align-self: stretch; }
@@ -1190,7 +1222,7 @@ class OneLineRoomCard extends HTMLElement {
     const unit = h.config.unit_system.temperature || "°C";
 
     const bgEl = this.shadowRoot.getElementById("bg");
-    bgEl.src = c.image || "/static/images/card_media/cover.png";
+    bgEl.src = roomPresetImage(c) || c.image || "/static/images/card_media/cover.png";
     bgEl.style.objectPosition = trimStr(c.image_position) || "center";
     if (c.image_entity && h.states[c.image_entity]) {
       const isOff = !isEntityActive(h.states[c.image_entity], c.image_entity);
@@ -1991,9 +2023,11 @@ class OneLineRoomCard extends HTMLElement {
         const txtDiv = topDiv.querySelector(".btn-txt");
         if (txtDiv) rightDiv.appendChild(txtDiv);
 
-        // Combined media control bar: [Mute] [---Slider---] [Play/Pause] [Next]
-        const bar = document.createElement("div");
-        bar.className = "media-control-bar";
+        // Two rows: transport controls on top, volume row below.
+        const transportBar = document.createElement("div");
+        transportBar.className = "media-control-bar media-transport-bar";
+        const volumeBar = document.createElement("div");
+        volumeBar.className = "media-control-bar media-volume-bar";
         let currentMuted = st?.attributes?.is_volume_muted === true;
         // Mute button
         const muteBtn = document.createElement("div");
@@ -2026,7 +2060,7 @@ class OneLineRoomCard extends HTMLElement {
             }
           }
         });
-        bar.appendChild(muteBtn);
+        volumeBar.appendChild(muteBtn);
         // Volume slider
         const wrap = document.createElement("div");
         wrap.className = "btn-slider-wrap";
@@ -2051,8 +2085,8 @@ class OneLineRoomCard extends HTMLElement {
           this._hass.callService("media_player", "volume_set", { entity_id: ctrl.entity, volume_level: v / 100 });
         });
         wrap.appendChild(slider);
-        bar.appendChild(wrap);
-        bar.appendChild(volLabel);
+        volumeBar.appendChild(wrap);
+        volumeBar.appendChild(volLabel);
         // Play/Pause button
         const playBtn = document.createElement("div");
         playBtn.className = "media-ctrl-btn";
@@ -2064,7 +2098,7 @@ class OneLineRoomCard extends HTMLElement {
             this._hass.callService("media_player", "media_play_pause", { entity_id: ctrl.entity });
           }
         });
-        bar.appendChild(playBtn);
+        transportBar.appendChild(playBtn);
         // Next track button
         const nextBtn = document.createElement("div");
         nextBtn.className = "media-ctrl-btn";
@@ -2076,8 +2110,9 @@ class OneLineRoomCard extends HTMLElement {
             this._hass.callService("media_player", "media_next_track", { entity_id: ctrl.entity });
           }
         });
-        bar.appendChild(nextBtn);
-        rightDiv.appendChild(bar);
+        transportBar.appendChild(nextBtn);
+        rightDiv.appendChild(transportBar);
+        rightDiv.appendChild(volumeBar);
         layout.appendChild(rightDiv);
         // Replace topDiv content with the full layout
         topDiv.innerHTML = "";
@@ -2677,6 +2712,26 @@ const eventDetail = {
 // =============================================================================
 // EDITOR CLASS
 // =============================================================================
+
+// The editor is a plain HTMLElement, so Home Assistant does not auto-load the
+// form components (ha-textfield/ha-formfield) it would for a Lit-based editor.
+// On some HA installs ha-textfield is not registered yet when the editor opens,
+// which makes bare <ha-textfield> elements (e.g. the room name field) render as
+// zero-height/invisible. Force-load them once via loadCardHelpers.
+let _formComponentsPromise = null;
+const ensureFormComponents = () => {
+  if (customElements.get("ha-textfield") && customElements.get("ha-formfield")) return Promise.resolve();
+  if (_formComponentsPromise) return _formComponentsPromise;
+  _formComponentsPromise = (async () => {
+    try {
+      const helpers = window.loadCardHelpers ? await window.loadCardHelpers() : null;
+      const card = helpers?.createCardElement?.({ type: "entities", entities: [] });
+      if (card?.constructor?.getConfigElement) await card.constructor.getConfigElement();
+    } catch (e) { /* best effort */ }
+  })();
+  return _formComponentsPromise;
+};
+
 class OneLineRoomCardEditor extends HTMLElement {
   constructor() {
     super();
@@ -2706,7 +2761,18 @@ class OneLineRoomCardEditor extends HTMLElement {
 
 connectedCallback() {
     document.addEventListener("click", this._boundHandlePrimarySave, true);
-    
+
+    // Ensure HA form components are registered; re-render once they load so
+    // bare ha-textfield fields (e.g. room name) become visible.
+    if (!customElements.get("ha-textfield") || !customElements.get("ha-formfield")) {
+      ensureFormComponents().then(() => {
+        if (this.isConnected && this._config) {
+          this.shadowRoot.innerHTML = "";
+          this.render();
+        }
+      });
+    }
+
     // FIX: Dropdowns zwingen, den neuen Wert optisch zu behalten
     this.addEventListener("value-changed", (ev) => {
       // ev.composedPath()[0] findet das ECHTE Element, auch tief im Shadow-DOM
@@ -3338,7 +3404,7 @@ connectedCallback() {
     if (!this._config) return;
     const alreadyRendered = !!this.shadowRoot.innerHTML;
     const domVersion = this.shadowRoot.querySelector("[data-rc-version]")?.dataset?.rcVersion;
-    if (alreadyRendered && domVersion === VERSION) { this.updVal(); if (JSON.stringify(this._config?.controls || []) !== this._lastRenderedControlsSig) this.renBtn(); this._applyNavSelectorOptions(); this._ensureNavOptions(); this._ensureAreaOptions(); this._updateAreaSetupUI(); this._updateSensorsSectionUI(); this._updateImageSectionUI(); this._updateBadgesUI(); this._updateTypographyUI(); this._updateCardBehaviorUI(); this._updateActionsSectionUI(); this._updateHeaderSectionUI(); this._updateTabUI(); this.updPreview(); this._wireImagePositionDrag(); return; }
+    if (alreadyRendered && domVersion === VERSION) { this.updVal(); if (JSON.stringify(this._config?.controls || []) !== this._lastRenderedControlsSig) this.renBtn(); this._applyNavSelectorOptions(); this._ensureNavOptions(); this._ensureAreaOptions(); this._updateAreaSetupUI(); this._updateSensorsSectionUI(); this._updateImageSectionUI(); this._updateBadgesUI(); this._updateTypographyUI(); this._updateCardBehaviorUI(); this._updateActionsSectionUI(); this._updateHeaderSectionUI(); this._updateTabUI(); this.updPreview(); this._wireImagePositionDrag(); this._updateImagePresetUI(); return; }
     
     this.shadowRoot.innerHTML = "";
     const h = this._hass;
@@ -3611,6 +3677,12 @@ connectedCallback() {
             <ha-icon id="image-chev" class="image-chev" icon="mdi:chevron-right"></ha-icon>
           </div>
           <div id="image-content" class="image-content" hidden>
+            <ha-formfield label="${getTranslation(h, "show_image")}" style="display:flex;align-items:center;margin-bottom:8px">
+              <ha-switch id="show-image-toggle"></ha-switch>
+            </ha-formfield>
+            <div style="width:100%;margin-bottom:8px;">
+              <ha-selector id="room-preset-sel" label="${getTranslation(h, "room_preset")}" style="width:100%;"></ha-selector>
+            </div>
             <div id="prev-wrap" class="preview-wrap">
               <img id="prev-img" class="preview">
               <div id="prev-focus" class="preview-focus"></div>
@@ -3619,18 +3691,18 @@ connectedCallback() {
               <span style="flex:1">${getTranslation(h, "image_position_help")}</span>
               <button type="button" id="img-pos-reset" class="bg-preset">${getTranslation(h, "image_position_reset")}</button>
             </div>
-            <ha-formfield label="${getTranslation(h, "show_image")}" style="display:flex;align-items:center;margin-bottom:8px">
-              <ha-switch id="show-image-toggle"></ha-switch>
-            </ha-formfield>
-            <ha-textfield id="img-url-field" cfg="image" class="i" icon="mdi:image"></ha-textfield>
+            <div id="room-preset-hint" style="display:none;font-size:11px;opacity:0.7;margin-bottom:8px"></div>
+            <div id="custom-image-controls">
+              <ha-textfield id="img-url-field" cfg="image" class="i" icon="mdi:image"></ha-textfield>
+              <div class="upload-row">
+                <input type="file" id="file-upload" class="upload-hidden" accept="image/*">
+                <mwc-button id="upload-btn" raised label="${getTranslation(h, "upload_btn")}">
+                  <ha-icon icon="mdi:upload" slot="icon"></ha-icon>
+                </mwc-button>
+              </div>
+            </div>
             <ha-entity-picker label="${getTranslation(h, "image_entity")}" cfg="image_entity" class="i" allow-custom-entity include-domains='["light", "switch", "input_boolean", "group"]' style="margin-top: 8px;"></ha-entity-picker>
             <div style="font-size:11px;opacity:0.7;margin-top:4px">${getTranslation(h, "image_entity_help")}</div>
-            <div class="upload-row">
-              <input type="file" id="file-upload" class="upload-hidden" accept="image/*">
-              <mwc-button id="upload-btn" raised label="${getTranslation(h, "upload_btn")}">
-                <ha-icon icon="mdi:upload" slot="icon"></ha-icon>
-              </mwc-button>
-            </div>
           </div>
         </div>
         <div id="typo-sec" class="manual-sec" style="margin-top:12px">
@@ -3894,6 +3966,31 @@ connectedCallback() {
       uploadBtn.addEventListener("click", () => fileInput.click());
       fileInput.addEventListener("change", (e) => this._handleUpload(e));
     }
+    const roomPresetSel = this.shadowRoot.getElementById("room-preset-sel");
+    if (roomPresetSel) {
+      roomPresetSel.hass = h;
+      roomPresetSel.selector = { select: { mode: "dropdown", options: [
+        ...ROOM_PRESETS.map(r => ({ value: r.value, label: r.label })),
+        { value: "custom", label: getTranslation(h, "room_custom") }
+      ] } };
+      roomPresetSel.value = this._currentRoomPreset();
+      roomPresetSel.addEventListener("value-changed", (ev) => {
+        ev.stopPropagation();
+        const v = ev.detail?.value;
+        const next = { ...this._config };
+        if (v === "custom") {
+          next.room_preset = "custom";
+        } else if (v) {
+          next.room_preset = v;
+          // A preset image takes over; drop any stale custom URL.
+          delete next.image;
+        }
+        this._fire(next);
+        this.updPreview();
+        this._updateImagePresetUI();
+      });
+    }
+    this._updateImagePresetUI();
     const areaSetupHead = this.shadowRoot.getElementById("area-setup-head");
     if (areaSetupHead) {
       areaSetupHead.addEventListener("click", () => {
@@ -5530,16 +5627,49 @@ if (tmplSelect) {
     return { x: 50, y: 50 };
   }
 
+  // Resolve which room-preset value the dropdown should show for the current config.
+  _currentRoomPreset() {
+    const c = this._config || {};
+    if (c.room_preset && c.room_preset !== "custom") {
+      return ROOM_PRESETS.some(r => r.value === c.room_preset) ? c.room_preset : "custom";
+    }
+    if (c.room_preset === "custom") return "custom";
+    // No explicit preset: custom if a manual image exists, otherwise default to Living Room.
+    return c.image ? "custom" : ROOM_PRESETS[0].value;
+  }
+
+  _updateImagePresetUI() {
+    const sel = this.shadowRoot?.getElementById("room-preset-sel");
+    const isCustom = this._currentRoomPreset() === "custom";
+    if (sel) {
+      const v = this._currentRoomPreset();
+      if (sel.value !== v) sel.value = v;
+    }
+    const customControls = this.shadowRoot?.getElementById("custom-image-controls");
+    if (customControls) customControls.style.display = isCustom ? "" : "none";
+    const hint = this.shadowRoot?.getElementById("room-preset-hint");
+    if (hint) {
+      const presetImg = roomPresetImage(this._config);
+      if (!isCustom && presetImg) {
+        hint.style.display = "";
+        hint.textContent = getTranslation(this._hass, "room_preset_hint").replace("{path}", presetImg);
+      } else {
+        hint.style.display = "none";
+      }
+    }
+  }
+
   updPreview() {
     if (!this._config) return;
     const img = this.shadowRoot.getElementById("prev-img");
     const wrap = this.shadowRoot.getElementById("prev-wrap");
     const focus = this.shadowRoot.getElementById("prev-focus");
     const posRow = this.shadowRoot.getElementById("img-pos-row");
-    const hasImage = !!this._config.image;
+    const src = roomPresetImage(this._config) || this._config.image || "";
+    const hasImage = !!src;
     if (wrap) wrap.classList.toggle("show", hasImage);
     if (posRow) posRow.style.display = hasImage ? "flex" : "none";
-    if (img && hasImage && img.src !== this._config.image) img.src = this._config.image;
+    if (img && hasImage && img.src !== src) img.src = src;
     const { x, y } = this._parseImagePosition(this._config.image_position);
     if (img) img.style.objectPosition = `${x}% ${y}%`;
     if (focus) { focus.style.left = `${x}%`; focus.style.top = `${y}%`; }

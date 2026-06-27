@@ -2,6 +2,14 @@
 
 All notable changes to OneLine Room Card are documented here.
 
+## [2.1.0]
+
+* Editor fix: **Room name field visible again** — The editor is a plain element, so on some HA installs `ha-textfield` was not registered when it opened, making bare text fields (incl. the room name) render invisible. The editor now force-loads the HA form components via `loadCardHelpers` and re-renders, so *Room name* (under *Card Behavior* and at the top of *Header*) reliably appears.
+* Runtime: **Media player volume on its own row** — In the full media-player button the volume (mute + slider) now sits on a separate row **below** the play/pause and next buttons, instead of being squeezed into the same line.
+* Editor & Runtime: **Room image presets** — The *Image* section now starts with the *Show background image* toggle, followed by a **Room** dropdown of common rooms (English; defaults to *Living Room*). Picking a room uses a prepared image from `/config/www/room-card/<room>.jpg`; the last option **Custom** reveals the URL field + upload as before. New config keys `room_preset` and optional `room_image_base`.
+
+---
+
 ## [2.0.0]
 
 * Runtime: **No status border/glow by default** — The colored outline + glow on humidity/battery/alert warnings is now opt-in via the new `status_border` option (default `false`). Toggle *Status border & glow* in *Card Behavior* to restore it.

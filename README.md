@@ -102,7 +102,9 @@ covers all settings — no YAML required.
 |---|---|---|
 | `name` | — | Room name |
 | `entity` | — | Main entity (drives header icon color) |
-| `image` | — | Header background image URL |
+| `image` | — | Header background image URL (used when `room_preset` is `custom`/unset) |
+| `room_preset` | `living_room` (new cards) | Prepared room image. One of `living_room`, `kitchen`, `bedroom`, `bathroom`, `dining_room`, `office`, `kids_room`, `hallway`, `guest_room`, `garage`, `garden`, `balcony`, `basement`, `laundry_room`, or `custom`. A preset loads `<room_image_base><room_preset>.jpg`; `custom` uses the `image` field / upload |
+| `room_image_base` | `/local/room-card/` | Base path/URL for preset room images. Place files in `/config/www/room-card/` (served at `/local/room-card/`) named e.g. `living_room.jpg` |
 | `image_position` | `center` | Visible area of the header image as `object-position` (e.g. `30% 80%`). Set it by dragging on the preview in the editor (image is `object-fit: cover`) |
 | `show_image` | `true` | Show the header background image. `false` hides the `<img>` and dark gradient and lets the header collapse to content height while name / icon / badges / chips remain visible |
 | `image_entity` | — | Light / switch / input_boolean / group entity. When this entity is off, the header image fades to grayscale |
