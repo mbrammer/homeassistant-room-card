@@ -1,4 +1,4 @@
-const VERSION = "2.1.0";
+const VERSION = "2.2.0";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -59,7 +59,7 @@ const TRANSLATIONS = {
     image_position_label: "Visible area (drag preview)", image_position_help: "Drag on the preview to choose which part of the image stays visible.", image_position_reset: "Center",
     status_border: "Status border & glow", status_border_help: "Show a colored border/glow on humidity, battery or alert warnings.",
     room_name: "Room name", sparkline_refresh_label: "Sparkline refresh (sec)", users_label: "Restrict to users (optional)",
-    room_preset: "Room", room_custom: "Custom (own image)", room_preset_hint: "Uses {path} — place the file there (in /config/www/...).",
+    room_preset: "Room", room_custom: "Custom (own image)",
     show_name: "Show Title", header_badges: "Badge", badge_add: "Add Info Entry", badge_label: "Label (optional)", badge_background: "Background (rgba)", standard_badge_background: "Standard Badge Background (rgba)", badge_auto_climate_btn: "Automatically add climate control button",
     visibility: "Visibility", visibility_cond: "Conditional Visibility", vis_entity: "Condition Entity", vis_state: "Show if state is", vis_invert: "Invert Logic (Hide if state corresponds)",
     migration_title: "Action Required",
@@ -150,7 +150,7 @@ const TRANSLATIONS = {
     image_position_label: "Sichtbarer Bereich (Vorschau ziehen)", image_position_help: "Auf der Vorschau ziehen, um festzulegen welcher Bildausschnitt sichtbar bleibt.", image_position_reset: "Zentrieren",
     status_border: "Status-Rahmen & Glow", status_border_help: "Farbigen Rahmen/Glow bei Feuchte-, Batterie- oder Alarm-Warnungen anzeigen.",
     room_name: "Raumname", sparkline_refresh_label: "Sparkline-Aktualisierung (Sek.)", users_label: "Auf Benutzer beschränken (optional)",
-    room_preset: "Raum", room_custom: "Eigenes Bild (Custom)", room_preset_hint: "Nutzt {path} — Datei dort ablegen (in /config/www/...).",
+    room_preset: "Raum", room_custom: "Eigenes Bild (Custom)",
     show_name: "Titel anzeigen", header_badges: "Badge", badge_add: "Info-Eintrag hinzufügen", badge_label: "Bezeichnung (optional)", badge_background: "Hintergrund (rgba)", standard_badge_background: "Standard Badge Hintergrund (rgba)", badge_auto_climate_btn: "Klima-Steuerungs-Button automatisch hinzufügen",
     visibility: "Sichtbarkeit", visibility_cond: "Bedingte Sichtbarkeit", vis_entity: "Bedingungs-Entität", vis_state: "Anzeigen falls Status gleich", vis_invert: "Logik umkehren (Ausblenden falls entsprechend)",
     migration_title: "Handlung erforderlich",
@@ -293,11 +293,12 @@ const clampNum = (v, min, max, fallback) => {
   return Number.isFinite(n) ? Math.max(min, Math.min(n, max)) : fallback;
 };
 
-// Prepared room images. Files are expected in HA's www folder:
-//   /config/www/room-card/<value>.jpg  ->  served at /local/room-card/<value>.jpg
+// Prepared room images ship with the card. HACS serves the dist/ folder at
+//   /hacsfiles/homeassistant-room-card/<value>.jpg
 // First entry (living_room) is the default selection. "custom" lets the user
 // upload / link their own image (handled separately in the editor).
-const ROOM_IMAGE_BASE = "/local/room-card/";
+// Override the base path with the `room_image_base` config option if needed.
+const ROOM_IMAGE_BASE = "/hacsfiles/homeassistant-room-card/";
 const ROOM_PRESETS = [
   { value: "living_room", label: "Living Room" },
   { value: "kitchen", label: "Kitchen" },
@@ -313,6 +314,8 @@ const ROOM_PRESETS = [
   { value: "balcony", label: "Balcony" },
   { value: "basement", label: "Basement" },
   { value: "laundry_room", label: "Laundry Room" },
+  { value: "attic", label: "Attic" },
+  { value: "workshop", label: "Workshop" },
 ];
 const roomPresetImage = (cfg) => {
   const base = (cfg && typeof cfg.room_image_base === "string" && cfg.room_image_base.trim()) || ROOM_IMAGE_BASE;
@@ -3691,7 +3694,6 @@ connectedCallback() {
               <span style="flex:1">${getTranslation(h, "image_position_help")}</span>
               <button type="button" id="img-pos-reset" class="bg-preset">${getTranslation(h, "image_position_reset")}</button>
             </div>
-            <div id="room-preset-hint" style="display:none;font-size:11px;opacity:0.7;margin-bottom:8px"></div>
             <div id="custom-image-controls">
               <ha-textfield id="img-url-field" cfg="image" class="i" icon="mdi:image"></ha-textfield>
               <div class="upload-row">
@@ -5647,16 +5649,6 @@ if (tmplSelect) {
     }
     const customControls = this.shadowRoot?.getElementById("custom-image-controls");
     if (customControls) customControls.style.display = isCustom ? "" : "none";
-    const hint = this.shadowRoot?.getElementById("room-preset-hint");
-    if (hint) {
-      const presetImg = roomPresetImage(this._config);
-      if (!isCustom && presetImg) {
-        hint.style.display = "";
-        hint.textContent = getTranslation(this._hass, "room_preset_hint").replace("{path}", presetImg);
-      } else {
-        hint.style.display = "none";
-      }
-    }
   }
 
   updPreview() {

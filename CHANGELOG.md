@@ -2,6 +2,14 @@
 
 All notable changes to OneLine Room Card are documented here.
 
+## [2.2.0]
+
+* Packaging: **Room images now ship with the card** — Moved `room-card.js` into `dist/` together with the prepared room images, following the HACS convention for plugins with extra assets. HACS serves them at `/hacsfiles/homeassistant-room-card/`, so every install gets the images out of the box. Default `room_image_base` is now `/hacsfiles/homeassistant-room-card/`. Replace the files in `dist/` to use your own photos.
+* Editor & Runtime: **Two more rooms** — Added `attic` and `workshop` to the room presets (now 16 rooms + Custom).
+* Editor: **Cleaner room dropdown** — Removed the file-path hint below the dropdown; the list now shows only the room names (Living Room, Bedroom, Attic, …).
+
+---
+
 ## [2.1.0]
 
 * Editor fix: **Room name field visible again** — The editor is a plain element, so on some HA installs `ha-textfield` was not registered when it opened, making bare text fields (incl. the room name) render invisible. The editor now force-loads the HA form components via `loadCardHelpers` and re-renders, so *Room name* (under *Card Behavior* and at the top of *Header*) reliably appears.

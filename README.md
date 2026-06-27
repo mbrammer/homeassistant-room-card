@@ -84,9 +84,12 @@ Developed with a focus on stability, simple design, and maximum flexibility.
 Or manually: HACS → Frontend → ⋮ → Custom repositories → paste URL → Category: Lovelace.
 
 ### Manual
-1. Download `room-card.js` from the [latest release](https://github.com/lop1505/RoomCard/releases)
-2. Copy to `/config/www/`
-3. Add resource: URL `/local/room-card.js` · Type: JavaScript Module
+1. Download the `dist/` folder contents (`room-card.js` + the room `*.jpg` images) from the [latest release](https://github.com/mbrammer/homeassistant-room-card/releases)
+2. Copy them to `/config/www/room-card/`
+3. Add resource: URL `/local/room-card/room-card.js` · Type: JavaScript Module
+4. If you copied the images here too, set the card option `room_image_base: /local/room-card/` so the presets resolve.
+
+> The prepared room images ship inside `dist/`. Via HACS they are served automatically at `/hacsfiles/homeassistant-room-card/`. To use your own photos, replace the files in `dist/` (keep the same names, e.g. `living_room.jpg`) or point `room_image_base` at your own folder.
 
 ---
 
@@ -103,8 +106,8 @@ covers all settings — no YAML required.
 | `name` | — | Room name |
 | `entity` | — | Main entity (drives header icon color) |
 | `image` | — | Header background image URL (used when `room_preset` is `custom`/unset) |
-| `room_preset` | `living_room` (new cards) | Prepared room image. One of `living_room`, `kitchen`, `bedroom`, `bathroom`, `dining_room`, `office`, `kids_room`, `hallway`, `guest_room`, `garage`, `garden`, `balcony`, `basement`, `laundry_room`, or `custom`. A preset loads `<room_image_base><room_preset>.jpg`; `custom` uses the `image` field / upload |
-| `room_image_base` | `/local/room-card/` | Base path/URL for preset room images. Place files in `/config/www/room-card/` (served at `/local/room-card/`) named e.g. `living_room.jpg` |
+| `room_preset` | `living_room` (new cards) | Prepared room image bundled with the card. One of `living_room`, `kitchen`, `bedroom`, `bathroom`, `dining_room`, `office`, `kids_room`, `hallway`, `guest_room`, `garage`, `garden`, `balcony`, `basement`, `laundry_room`, `attic`, `workshop`, or `custom`. A preset loads `<room_image_base><room_preset>.jpg`; `custom` uses the `image` field / upload |
+| `room_image_base` | `/hacsfiles/homeassistant-room-card/` | Base path/URL for the preset room images. The images ship in the card's `dist/` folder and HACS serves them here. Override only to use your own image set (e.g. `/local/my-rooms/`) |
 | `image_position` | `center` | Visible area of the header image as `object-position` (e.g. `30% 80%`). Set it by dragging on the preview in the editor (image is `object-fit: cover`) |
 | `show_image` | `true` | Show the header background image. `false` hides the `<img>` and dark gradient and lets the header collapse to content height while name / icon / badges / chips remain visible |
 | `image_entity` | — | Light / switch / input_boolean / group entity. When this entity is off, the header image fades to grayscale |
