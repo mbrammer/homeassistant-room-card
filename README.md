@@ -103,6 +103,7 @@ covers all settings — no YAML required.
 | `name` | — | Room name |
 | `entity` | — | Main entity (drives header icon color) |
 | `image` | — | Header background image URL |
+| `image_position` | `center` | Visible area of the header image as `object-position` (e.g. `30% 80%`). Set it by dragging on the preview in the editor (image is `object-fit: cover`) |
 | `show_image` | `true` | Show the header background image. `false` hides the `<img>` and dark gradient and lets the header collapse to content height while name / icon / badges / chips remain visible |
 | `image_entity` | — | Light / switch / input_boolean / group entity. When this entity is off, the header image fades to grayscale |
 | `header_height` | `120` | Header image height in px (`0` = hidden, ignored when `show_image: false`) |
@@ -116,6 +117,8 @@ covers all settings — no YAML required.
 | `global_button_background` | — | Default button background (e.g. `rgba(0,0,0,0)`) |
 | `show_card_last_activity` | `false` | Show a header badge with elapsed time since the most recently changed button entity (e.g. `5 min`, `2h 15min`). Auto-refreshes every 60 s. |
 | `sparkline_refresh` | `300` | Auto-refresh cadence for all sparkline buttons in seconds (60–3600) |
+| `status_border` | `false` | Show a colored outline + glow on the card for humidity / battery / alert warnings. Off by default (no border/glow) |
+| `users` | — | List of Home Assistant user IDs the card is visible to (empty = everyone) |
 
 #### Sensors & chips
 | Option | Default | Description |

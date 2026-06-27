@@ -1,4 +1,4 @@
-const VERSION = "1.2.9";
+const VERSION = "2.0.0";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -55,6 +55,10 @@ const TRANSLATIONS = {
     service: "Service (domain.service)", service_data: "Service Data (JSON)", target_entity: "Target entity",
     live_preview: "Live preview",
     upload_btn: "Upload Image", uploading: "Uploading...", upload_success: "Done!",
+    upload_failed: "Upload failed", upload_too_large: "Too large ({size} MB, max 10)", upload_not_image: "Not an image",
+    image_position_label: "Visible area (drag preview)", image_position_help: "Drag on the preview to choose which part of the image stays visible.", image_position_reset: "Center",
+    status_border: "Status border & glow", status_border_help: "Show a colored border/glow on humidity, battery or alert warnings.",
+    room_name: "Room name", sparkline_refresh_label: "Sparkline refresh (sec)", users_label: "Restrict to users (optional)",
     show_name: "Show Title", header_badges: "Badge", badge_add: "Add Info Entry", badge_label: "Label (optional)", badge_background: "Background (rgba)", standard_badge_background: "Standard Badge Background (rgba)", badge_auto_climate_btn: "Automatically add climate control button",
     visibility: "Visibility", visibility_cond: "Conditional Visibility", vis_entity: "Condition Entity", vis_state: "Show if state is", vis_invert: "Invert Logic (Hide if state corresponds)",
     migration_title: "Action Required",
@@ -141,6 +145,10 @@ const TRANSLATIONS = {
     service: "Service (domain.service)", service_data: "Service Daten (JSON)", target_entity: "Ziel-Entität",
     live_preview: "Live-Vorschau",
     upload_btn: "Bild hochladen", uploading: "Wird hochgeladen...", upload_success: "Fertig!",
+    upload_failed: "Upload fehlgeschlagen", upload_too_large: "Zu groß ({size} MB, max 10)", upload_not_image: "Kein Bild",
+    image_position_label: "Sichtbarer Bereich (Vorschau ziehen)", image_position_help: "Auf der Vorschau ziehen, um festzulegen welcher Bildausschnitt sichtbar bleibt.", image_position_reset: "Zentrieren",
+    status_border: "Status-Rahmen & Glow", status_border_help: "Farbigen Rahmen/Glow bei Feuchte-, Batterie- oder Alarm-Warnungen anzeigen.",
+    room_name: "Raumname", sparkline_refresh_label: "Sparkline-Aktualisierung (Sek.)", users_label: "Auf Benutzer beschränken (optional)",
     show_name: "Titel anzeigen", header_badges: "Badge", badge_add: "Info-Eintrag hinzufügen", badge_label: "Bezeichnung (optional)", badge_background: "Hintergrund (rgba)", standard_badge_background: "Standard Badge Hintergrund (rgba)", badge_auto_climate_btn: "Klima-Steuerungs-Button automatisch hinzufügen",
     visibility: "Sichtbarkeit", visibility_cond: "Bedingte Sichtbarkeit", vis_entity: "Bedingungs-Entität", vis_state: "Anzeigen falls Status gleich", vis_invert: "Logik umkehren (Ausblenden falls entsprechend)",
     migration_title: "Handlung erforderlich",
@@ -838,9 +846,10 @@ class OneLineRoomCard extends HTMLElement {
         .info-item.badge { padding: 2px 6px; border-radius: 999px; }
         .chips { position: absolute; bottom: 8px; left: 8px; display: flex; gap: 6px; flex-wrap: wrap; z-index: 2; }
         .chip { display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 8px; font-size: 11px; font-weight: bold; background: #FFF8E1; color: #FFA000; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-        .chip.alert { background: #FFEBEE; color: #D32F2F; }
-        .chip.humidity { background: #E3F2FD; color: #1976D2; }
-        .chip.info { background: #E3F2FD; color: #1976D2; }
+        .chip ha-icon { color: currentColor; --mdc-icon-size: 14px; }
+        .chip.alert { background: #FFEBEE; color: #C62828; }
+        .chip.humidity { background: #1565C0; color: #FFFFFF; }
+        .chip.info { background: #1565C0; color: #FFFFFF; }
         .chip.custom { background: var(--chip-bg); color: var(--chip-color); }
         .controls { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; }
         .btn.has-sparkline { height: auto; align-items: stretch; overflow: visible; flex-wrap: wrap; padding-bottom: 6px; }
@@ -1182,6 +1191,7 @@ class OneLineRoomCard extends HTMLElement {
 
     const bgEl = this.shadowRoot.getElementById("bg");
     bgEl.src = c.image || "/static/images/card_media/cover.png";
+    bgEl.style.objectPosition = trimStr(c.image_position) || "center";
     if (c.image_entity && h.states[c.image_entity]) {
       const isOff = !isEntityActive(h.states[c.image_entity], c.image_entity);
       bgEl.classList.toggle("grayscale", isOff);
@@ -1421,9 +1431,10 @@ class OneLineRoomCard extends HTMLElement {
 
     const cardEl = this.shadowRoot.querySelector("ha-card");
     if (cardEl) {
-      cardEl.classList.toggle("warning-battery", batteryWarn);
-      cardEl.classList.toggle("warning-humidity", !batteryWarn && humidityWarn);
-      cardEl.classList.toggle("alert-sensor", !batteryWarn && !humidityWarn && alertSensorWarn);
+      const statusBorder = c.status_border === true;
+      cardEl.classList.toggle("warning-battery", statusBorder && batteryWarn);
+      cardEl.classList.toggle("warning-humidity", statusBorder && !batteryWarn && humidityWarn);
+      cardEl.classList.toggle("alert-sensor", statusBorder && !batteryWarn && !humidityWarn && alertSensorWarn);
       if (trimStr(c.alert_border_color)) cardEl.style.setProperty("--rc-alert-border-color", trimStr(c.alert_border_color));
       else cardEl.style.removeProperty("--rc-alert-border-color");
 
@@ -2855,28 +2866,77 @@ connectedCallback() {
     btn.setAttribute("title", label);
   }
 
+  // Downscale an image file to max `maxWidth` px wide, re-encode as JPEG.
+  // Returns a Blob, or null when the file is not a decodable image.
+  _downscaleImage(file, maxWidth = 600, quality = 0.75) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const scale = img.width > maxWidth ? maxWidth / img.width : 1;
+          const w = Math.round(img.width * scale);
+          const h = Math.round(img.height * scale);
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          canvas.toBlob(
+            (blob) => { URL.revokeObjectURL(url); blob ? resolve(blob) : reject(new Error("encode_failed")); },
+            "image/jpeg",
+            quality
+          );
+        } catch (err) { URL.revokeObjectURL(url); reject(err); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+  }
+
   async _handleUpload(e) {
     const file = e.target.files[0];
     if (!file || !this._hass) return;
     const btn = this.shadowRoot.getElementById("upload-btn");
-    if (btn) btn.innerText = getTranslation(this._hass, "uploading");
+    const setBtn = (key) => { if (btn) btn.innerText = getTranslation(this._hass, key); };
+    const fail = (key) => { if (btn) btn.innerText = getTranslation(this._hass, key); };
+    const MAX_BYTES = 10 * 1024 * 1024;
     try {
+      if (!file.type.startsWith("image/")) { fail("upload_not_image"); return; }
+      if (file.size > MAX_BYTES) {
+        const mb = (file.size / (1024 * 1024)).toFixed(1);
+        if (btn) btn.innerText = getTranslation(this._hass, "upload_too_large").replace("{size}", mb);
+        return;
+      }
+      setBtn("uploading");
+      // Always re-encode to keep the stored image small (max 600px, JPEG 75%).
+      let payload = file;
+      let filename = file.name;
+      const resized = await this._downscaleImage(file, 600, 0.75);
+      if (resized) {
+        payload = resized;
+        filename = (file.name.replace(/\.[^.]+$/, "") || "image") + ".jpg";
+      }
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", payload, filename);
       const response = await this._hass.fetchWithAuth("/api/image/upload", {
         method: "POST",
         body: formData,
       });
-      if (!response.ok) throw new Error("Upload failed");
+      if (!response.ok) {
+        let detail = `HTTP ${response.status}`;
+        try { const t = await response.text(); if (t) detail = t.slice(0, 140); } catch (_) {}
+        throw new Error(detail);
+      }
       const data = await response.json();
       const imgUrl = `/api/image/serve/${data.id}/original`;
       this._fire({ ...this._config, image: imgUrl });
       this.updPreview();
-      if (btn) btn.innerText = getTranslation(this._hass, "upload_success");
+      setBtn("upload_success");
       setTimeout(() => { if (btn) btn.innerText = getTranslation(this._hass, "upload_btn"); }, 2000);
     } catch (err) {
       console.error("Upload Error:", err);
-      if (btn) btn.innerText = "Error!";
+      if (btn) btn.innerText = getTranslation(this._hass, "upload_failed") + ": " + (err?.message || err);
     }
   }
 
@@ -3278,7 +3338,7 @@ connectedCallback() {
     if (!this._config) return;
     const alreadyRendered = !!this.shadowRoot.innerHTML;
     const domVersion = this.shadowRoot.querySelector("[data-rc-version]")?.dataset?.rcVersion;
-    if (alreadyRendered && domVersion === VERSION) { this.updVal(); if (JSON.stringify(this._config?.controls || []) !== this._lastRenderedControlsSig) this.renBtn(); this._applyNavSelectorOptions(); this._ensureNavOptions(); this._ensureAreaOptions(); this._updateAreaSetupUI(); this._updateSensorsSectionUI(); this._updateImageSectionUI(); this._updateBadgesUI(); this._updateTypographyUI(); this._updateCardBehaviorUI(); this._updateActionsSectionUI(); this._updateHeaderSectionUI(); this._updateTabUI(); return; }
+    if (alreadyRendered && domVersion === VERSION) { this.updVal(); if (JSON.stringify(this._config?.controls || []) !== this._lastRenderedControlsSig) this.renBtn(); this._applyNavSelectorOptions(); this._ensureNavOptions(); this._ensureAreaOptions(); this._updateAreaSetupUI(); this._updateSensorsSectionUI(); this._updateImageSectionUI(); this._updateBadgesUI(); this._updateTypographyUI(); this._updateCardBehaviorUI(); this._updateActionsSectionUI(); this._updateHeaderSectionUI(); this._updateTabUI(); this.updPreview(); this._wireImagePositionDrag(); return; }
     
     this.shadowRoot.innerHTML = "";
     const h = this._hass;
@@ -3345,8 +3405,10 @@ connectedCallback() {
         .summary-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .body { margin-top: 8px; }
         ha-textfield, ha-selector, ha-entity-picker, ha-icon-picker { width: 100%; display: block; margin-bottom: 8px; }
-        .preview { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; background: #444; display: none; }
-        .preview.show { display: block; }
+        .preview-wrap { position: relative; display: none; margin-bottom: 8px; }
+        .preview-wrap.show { display: block; }
+        .preview { width: 100%; height: 120px; object-fit: cover; object-position: center; border-radius: 8px; background: #444; display: block; cursor: crosshair; touch-action: none; user-select: none; -webkit-user-drag: none; }
+        .preview-focus { position: absolute; width: 18px; height: 18px; margin: -9px 0 0 -9px; border: 2px solid #fff; border-radius: 50%; box-shadow: 0 0 0 2px rgba(0,0,0,0.5); pointer-events: none; left: 50%; top: 50%; }
         .upload-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
         .upload-hidden { display: none; }
         .cl-row { display: flex; gap: 8px; align-items: center; }
@@ -3435,6 +3497,12 @@ connectedCallback() {
           <div style="width:100%;">
             <ha-selector id="behavior-sel" label="${getTranslation(h, "behavior")}" style="width:100%;"></ha-selector>
           </div>
+          <ha-formfield label="${getTranslation(h, "status_border")}" title="${getTranslation(h, "status_border_help")}" style="display:flex;align-items:center">
+            <ha-switch id="status-border-toggle"></ha-switch>
+          </ha-formfield>
+          <div style="width:100%;">
+            <ha-selector id="users-sel" label="${getTranslation(h, "users_label")}" style="width:100%;"></ha-selector>
+          </div>
         </div>
         <div id="actions-sec" class="manual-sec" style="margin-top:12px">
           <div id="actions-head" class="manual-head">
@@ -3474,6 +3542,7 @@ connectedCallback() {
         </div>
         <div id="header-sec-content">
         <div class="editor-stack" style="margin-top:4px;">
+          <ha-textfield label="${getTranslation(h, "room_name")}" cfg="name" class="i" style="width:100%;"></ha-textfield>
           <ha-textfield label="${getTranslation(h, "header_height")}" cfg="header_height" class="i" type="number" min="0" max="400" style="flex:1" placeholder="120"></ha-textfield>
           <div class="field-with-inline-control">
             <ha-icon-picker label="${getTranslation(h, "icon")}" cfg="icon" class="i" style="width: 100%;"></ha-icon-picker>
@@ -3542,7 +3611,14 @@ connectedCallback() {
             <ha-icon id="image-chev" class="image-chev" icon="mdi:chevron-right"></ha-icon>
           </div>
           <div id="image-content" class="image-content" hidden>
-            <img id="prev-img" class="preview">
+            <div id="prev-wrap" class="preview-wrap">
+              <img id="prev-img" class="preview">
+              <div id="prev-focus" class="preview-focus"></div>
+            </div>
+            <div id="img-pos-row" style="display:none;align-items:center;justify-content:space-between;font-size:11px;opacity:0.8;margin-bottom:8px;gap:8px">
+              <span style="flex:1">${getTranslation(h, "image_position_help")}</span>
+              <button type="button" id="img-pos-reset" class="bg-preset">${getTranslation(h, "image_position_reset")}</button>
+            </div>
             <ha-formfield label="${getTranslation(h, "show_image")}" style="display:flex;align-items:center;margin-bottom:8px">
               <ha-switch id="show-image-toggle"></ha-switch>
             </ha-formfield>
@@ -3739,6 +3815,7 @@ connectedCallback() {
         <div class="row">
           <ha-selector id="global-label-pos" label="${getTranslation(h, "label_position_all")}"></ha-selector>
           <ha-textfield id="global-icon-size" label="${getTranslation(h, "global_icon_size")}" type="number" style="max-width:140px" placeholder="20"></ha-textfield>
+          <ha-textfield id="sparkline-refresh" label="${getTranslation(h, "sparkline_refresh_label")}" type="number" min="60" max="3600" style="max-width:200px" placeholder="300"></ha-textfield>
         </div>
         <div class="cl-row" style="margin-top: 8px">
           <ha-textfield id="global-btn-bg" cfg="global_button_background" label="${getTranslation(h, "global_button_bg")}" class="i"></ha-textfield>
@@ -4750,7 +4827,47 @@ const updateActionFields = (action, serviceField, serviceDataField, targetField,
         this._fire(next);
       });
     }
-    
+
+    const statusBorderToggle = this.shadowRoot.getElementById("status-border-toggle");
+    if (statusBorderToggle) {
+      statusBorderToggle.checked = this._config?.status_border === true;
+      statusBorderToggle.addEventListener("change", (ev) => {
+        ev.stopPropagation();
+        const next = { ...this._config };
+        if (ev.target.checked === true) next.status_border = true;
+        else delete next.status_border;
+        this._fire(next);
+      });
+    }
+
+    const usersSel = this.shadowRoot.getElementById("users-sel");
+    if (usersSel) {
+      usersSel.hass = h;
+      usersSel.selector = { user: { multiple: true } };
+      usersSel.value = Array.isArray(this._config?.users) ? this._config.users : [];
+      usersSel.addEventListener("value-changed", (ev) => {
+        ev.stopPropagation();
+        const v = ev.detail?.value;
+        const next = { ...this._config };
+        if (Array.isArray(v) && v.length > 0) next.users = v;
+        else delete next.users;
+        this._fire(next);
+      });
+    }
+
+    const sparklineRefresh = this.shadowRoot.getElementById("sparkline-refresh");
+    if (sparklineRefresh) {
+      sparklineRefresh.value = this._config?.sparkline_refresh ?? "";
+      sparklineRefresh.addEventListener("change", (ev) => {
+        ev.stopPropagation();
+        const raw = String(ev.target.value ?? "").trim();
+        const next = { ...this._config };
+        if (raw === "") delete next.sparkline_refresh;
+        else next.sparkline_refresh = clampNum(raw, 60, 3600, 300);
+        this._fire(next);
+      });
+    }
+
     const standardBadgeBg = this.shadowRoot.getElementById("standard-badge-bg");
     const standardBadgeBgPicker = this.shadowRoot.getElementById("standard-badge-bg-picker");
     if (standardBadgeBg) {
@@ -4976,6 +5093,7 @@ if (tmplSelect) {
     }
     this._updateBulkToggleButton();
     this.updVal(); this.updCp(); this.renBtn(); this.updPreview();
+    this._wireImagePositionDrag();
     this._updateSensorsSectionUI();
     this._updateImageSectionUI();
     this._updateTypographyUI();
@@ -5406,13 +5524,69 @@ if (tmplSelect) {
     });
   }
 
+  _parseImagePosition(pos) {
+    const m = /^\s*([\d.]+)%\s+([\d.]+)%\s*$/.exec(typeof pos === "string" ? pos : "");
+    if (m) return { x: clampNum(m[1], 0, 100, 50), y: clampNum(m[2], 0, 100, 50) };
+    return { x: 50, y: 50 };
+  }
+
   updPreview() {
     if (!this._config) return;
     const img = this.shadowRoot.getElementById("prev-img");
-    if (this._config.image) {
-      img.src = this._config.image;
-      img.classList.add("show");
-    } else { img.classList.remove("show"); }
+    const wrap = this.shadowRoot.getElementById("prev-wrap");
+    const focus = this.shadowRoot.getElementById("prev-focus");
+    const posRow = this.shadowRoot.getElementById("img-pos-row");
+    const hasImage = !!this._config.image;
+    if (wrap) wrap.classList.toggle("show", hasImage);
+    if (posRow) posRow.style.display = hasImage ? "flex" : "none";
+    if (img && hasImage && img.src !== this._config.image) img.src = this._config.image;
+    const { x, y } = this._parseImagePosition(this._config.image_position);
+    if (img) img.style.objectPosition = `${x}% ${y}%`;
+    if (focus) { focus.style.left = `${x}%`; focus.style.top = `${y}%`; }
+  }
+
+  _setImagePosFromEvent(ev) {
+    const img = this.shadowRoot.getElementById("prev-img");
+    if (!img) return;
+    const rect = img.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const px = clampNum(((ev.clientX - rect.left) / rect.width) * 100, 0, 100, 50);
+    const py = clampNum(((ev.clientY - rect.top) / rect.height) * 100, 0, 100, 50);
+    const value = `${Math.round(px)}% ${Math.round(py)}%`;
+    const next = { ...this._config };
+    if (value === "50% 50%") delete next.image_position;
+    else next.image_position = value;
+    this._fire(next);
+    this.updPreview();
+  }
+
+  _wireImagePositionDrag() {
+    const img = this.shadowRoot.getElementById("prev-img");
+    const resetBtn = this.shadowRoot.getElementById("img-pos-reset");
+    if (img && !img._posDragWired) {
+      img._posDragWired = true;
+      let dragging = false;
+      const move = (ev) => { if (dragging) { ev.preventDefault(); this._setImagePosFromEvent(ev); } };
+      const up = () => { dragging = false; };
+      img.addEventListener("pointerdown", (ev) => {
+        dragging = true;
+        try { img.setPointerCapture(ev.pointerId); } catch (_) {}
+        this._setImagePosFromEvent(ev);
+      });
+      img.addEventListener("pointermove", move);
+      img.addEventListener("pointerup", up);
+      img.addEventListener("pointercancel", up);
+    }
+    if (resetBtn && !resetBtn._wired) {
+      resetBtn._wired = true;
+      resetBtn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        const next = { ...this._config };
+        delete next.image_position;
+        this._fire(next);
+        this.updPreview();
+      });
+    }
   }
 
   _saveAllScrollPositions() {
@@ -6594,7 +6768,23 @@ const cm = box.querySelector(".cm");
     if (infoLinePosSel) {
       const posVal = this._config.info_line_position || "header";
       if (infoLinePosSel.value !== posVal) infoLinePosSel.value = posVal;
-    }                           
+    }
+
+    const statusBorderToggle = this.shadowRoot.getElementById("status-border-toggle");
+    if (statusBorderToggle) {
+      const v = this._config?.status_border === true;
+      if (statusBorderToggle.checked !== v) statusBorderToggle.checked = v;
+    }
+    const usersSel = this.shadowRoot.getElementById("users-sel");
+    if (usersSel) {
+      const v = Array.isArray(this._config?.users) ? this._config.users : [];
+      if (JSON.stringify(usersSel.value || []) !== JSON.stringify(v)) usersSel.value = v;
+    }
+    const sparklineRefresh = this.shadowRoot.getElementById("sparkline-refresh");
+    if (sparklineRefresh) {
+      const v = this._config?.sparkline_refresh ?? "";
+      if (String(sparklineRefresh.value ?? "") !== String(v)) sparklineRefresh.value = v;
+    }
 
     const tapActionSel = this.shadowRoot.getElementById("tap-action");
     const holdActionSel = this.shadowRoot.getElementById("hold-action");

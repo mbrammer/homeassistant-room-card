@@ -2,6 +2,17 @@
 
 All notable changes to OneLine Room Card are documented here.
 
+## [2.0.0]
+
+* Runtime: **No status border/glow by default** — The colored outline + glow on humidity/battery/alert warnings is now opt-in via the new `status_border` option (default `false`). Toggle *Status border & glow* in *Card Behavior* to restore it.
+* Runtime & Editor: **Image visible area (focal point)** — New `image_position` option (`object-position`, e.g. `30% 80%`). Drag directly on the editor preview to choose which part of the `object-fit: cover` header image stays visible; a marker shows the focus and a *Center* button resets it.
+* Editor: **Smarter image upload** — Uploads now accept files up to 10 MB and are downscaled client-side to max 600 px width / JPEG 75 % before saving, keeping stored images small. Clear error messages replace the generic "Error!" (e.g. *Too large (X MB, max 10)*, *Not an image*, *Upload failed: …*).
+* Runtime: **Humidity/info chip readability** — Chip icons now inherit the chip text color (previously rendered white on a light background and were nearly invisible); humidity/info chips use a solid high-contrast blue.
+* Editor: **Room name in Header section** — Added a clearly labeled *Room name* field at the top of the *Header* section (in addition to the existing one under *Card Behavior*).
+* Editor: **Newly exposed options** — Added UI controls for `sparkline_refresh` (Buttons tab) and `users` (visibility per Home Assistant user, *Card Behavior*).
+
+---
+
 ## [1.2.9]
 
 * Runtime & Editor: **Window Labels and Solid Backgrounds** — Window/door chips now support per-entity custom labels via `window_labels` and an optional `window_solid_background` mode for full-color chips with readable text contrast. Added visual editor controls under *Sensors* and documented the YAML options. Closes [#84](https://github.com/lop1505/RoomCard/issues/84).
