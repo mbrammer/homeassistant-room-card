@@ -1,4 +1,4 @@
-const VERSION = "2.3.1";
+const VERSION = "2.4.0";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -321,7 +321,8 @@ const roomPresetImage = (cfg) => {
   const base = (cfg && typeof cfg.room_image_base === "string" && cfg.room_image_base.trim()) || ROOM_IMAGE_BASE;
   const slug = cfg && cfg.room_preset;
   if (!slug || slug === "custom") return null;
-  return base.replace(/\/?$/, "/") + slug + ".jpg";
+  // Append the release version so updated assets bust the browser cache.
+  return base.replace(/\/?$/, "/") + slug + ".jpg?v=" + VERSION;
 };
 
 const replaceTemplateExpressions = (str, evalExpr) => {
@@ -5802,7 +5803,10 @@ if (tmplSelect) {
           <div class="dv-wrap"></div>
           <ha-entity-picker class="ep" label="${getTranslation(h, "entity")}"></ha-entity-picker>
           <div class="row" style="align-items: flex-end;">
-            <ha-textfield class="nm" label="${getTranslation(h, "name")}"></ha-textfield>
+            <div class="sensor-label-wrap" style="flex:1; min-width:0; margin:0">
+              <label class="window-label-field-label">${getTranslation(h, "name")}</label>
+              <input class="window-label-input nm" type="text" placeholder="${getTranslation(h, "name")}">
+            </div>
             <div style="position: relative; flex: 1; display: flex; align-items: flex-end;">
               <ha-icon-picker class="ic" label="${getTranslation(h, "icon")}" style="width: 100%;"></ha-icon-picker>
               <div class="color-container" style="position: absolute; right: 8px; bottom: 8px; z-index: 1;">
@@ -6052,7 +6056,7 @@ if (tmplSelect) {
         });
         dvWrap.appendChild(dv);
       }
-      const nm = box.querySelector(".nm"); if (nm) { nm.value = ctrl.name || ""; nm.addEventListener("change", e => upd("name", e.target.value)); }
+      const nm = box.querySelector(".nm"); if (nm) { nm.value = ctrl.name || ""; const onNm = e => upd("name", e.target.value); nm.addEventListener("input", onNm); nm.addEventListener("change", onNm); nm.addEventListener("keydown", e => e.stopPropagation()); }
 
       const clPop = box.querySelector(".cl-pop");
       const clp = box.querySelector(".cl-p");
