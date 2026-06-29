@@ -2,6 +2,14 @@
 
 All notable changes to OneLine Room Card are documented here.
 
+## [2.3.0]
+
+* Editor fix: **Room name editable for everyone** — On some HA installs `ha-textfield` did not render in the editor, hiding the room name field. The *Room name* field (top of *Card Behavior*) is now a plain input that always renders, so the header name can reliably be changed.
+* Runtime: **Media player previous button + centered controls** — The transport row now has previous / play-pause / next, centered above the volume row.
+* Runtime: **Square media cover** — The media-player cover thumbnail is now a fixed 1:1 square (`object-fit: cover`) instead of stretching to the row height.
+
+---
+
 ## [2.2.0]
 
 * Packaging: **Room images now ship with the card** — Moved `room-card.js` into `dist/` together with the prepared room images, following the HACS convention for plugins with extra assets. HACS serves them at `/hacsfiles/homeassistant-room-card/`, so every install gets the images out of the box. Default `room_image_base` is now `/hacsfiles/homeassistant-room-card/`. Replace the files in `dist/` to use your own photos.

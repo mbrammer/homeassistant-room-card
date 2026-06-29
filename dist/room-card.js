@@ -1,4 +1,4 @@
-const VERSION = "2.2.0";
+const VERSION = "2.3.0";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -946,11 +946,11 @@ class OneLineRoomCard extends HTMLElement {
         .media-control-bar .btn-slider-wrap { flex: 1; min-width: 0; padding: 0; }
         .media-control-bar .btn-slider { height: 4px; }
         .media-control-bar .vol-label { font-size: 10px; font-weight: 600; color: var(--secondary-text-color); min-width: 28px; text-align: center; flex: 0 0 auto; }
-        .media-transport-bar { gap: 8px; padding-bottom: 0; }
+        .media-transport-bar { gap: 14px; padding-bottom: 0; justify-content: center; }
         .media-volume-bar { padding-top: 0; }
         .media-thumb { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0; }
         .media-full-layout { display: flex; gap: 10px; width: 100%; align-items: stretch; }
-        .media-full-layout .media-thumb { width: 56px; height: auto; min-height: 56px; border-radius: 6px; align-self: stretch; }
+        .media-full-layout .media-thumb { width: 56px; height: 56px; aspect-ratio: 1 / 1; border-radius: 6px; object-fit: cover; align-self: center; flex-shrink: 0; }
         .media-full-layout .media-right { display: flex; flex-direction: column; flex: 1; min-width: 0; justify-content: center; gap: 2px; }
         .btn-cover-presets { display: flex; gap: 4px; width: 100%; flex: 0 0 auto; padding-bottom: 4px; }
         .preset-btn { flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(128,128,128,0.1); border-radius: 6px; padding: 3px 4px; cursor: pointer; transition: background 0.15s, color 0.15s; font-size: 11px; font-weight: 600; color: var(--secondary-text-color); white-space: nowrap; touch-action: manipulation; }
@@ -2090,6 +2090,18 @@ class OneLineRoomCard extends HTMLElement {
         wrap.appendChild(slider);
         volumeBar.appendChild(wrap);
         volumeBar.appendChild(volLabel);
+        // Previous track button
+        const prevBtn = document.createElement("div");
+        prevBtn.className = "media-ctrl-btn";
+        prevBtn.innerHTML = `<ha-icon icon="mdi:skip-previous"></ha-icon>`;
+        prevBtn.addEventListener("pointerdown", e => e.stopPropagation());
+        prevBtn.addEventListener("click", e => {
+          e.stopPropagation();
+          if (!this._isEntityUnavailable(ctrl.entity)) {
+            this._hass.callService("media_player", "media_previous_track", { entity_id: ctrl.entity });
+          }
+        });
+        transportBar.appendChild(prevBtn);
         // Play/Pause button
         const playBtn = document.createElement("div");
         playBtn.className = "media-ctrl-btn";
@@ -3558,11 +3570,13 @@ connectedCallback() {
           <ha-formfield label="${getTranslation(h, "live_preview")}">
             <ha-switch id="live-preview-toggle" checked></ha-switch>
           </ha-formfield>
-          <div class="field-with-inline-control">
-            <ha-textfield label="${getTranslation(h, "name")}" cfg="name" class="i" style="width: 100%;"></ha-textfield>
-            <ha-switch id="show-name-toggle" checked title="${getTranslation(h, "show_name")}"
-                       class="field-inline-switch" style="--mdc-switch-size: 20px;"></ha-switch>
+          <div class="sensor-label-wrap" style="margin:2px 0 4px">
+            <label class="window-label-field-label">${getTranslation(h, "room_name")}</label>
+            <input class="window-label-input sensor-label-input" data-cfg="name" type="text" placeholder="Room">
           </div>
+          <ha-formfield label="${getTranslation(h, "show_name")}" style="display:flex;align-items:center">
+            <ha-switch id="show-name-toggle" checked></ha-switch>
+          </ha-formfield>
           <div style="width:100%;">
             <ha-selector id="behavior-sel" label="${getTranslation(h, "behavior")}" style="width:100%;"></ha-selector>
           </div>
