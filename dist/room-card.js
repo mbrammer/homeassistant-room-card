@@ -1,4 +1,4 @@
-const VERSION = "2.3.0";
+const VERSION = "2.3.1";
 const LOG_FLAG = `customCards_RoomCard_Logged_${VERSION}`;
 
 if (!window[LOG_FLAG]) {
@@ -4158,7 +4158,7 @@ connectedCallback() {
       const k = input.dataset?.cfg;
       if (!k) return;
       input.value = this._config?.[k] || "";
-      input.addEventListener("change", (ev) => {
+      const onEdit = (ev) => {
         ev.stopPropagation();
         const raw = trimStr(ev.target.value || "");
         const next = { ...this._config };
@@ -4166,7 +4166,11 @@ connectedCallback() {
         else delete next[k];
         this._fire(next);
         this._syncManualSensorLabelInputs();
-      });
+      };
+      // "input" keeps the live preview in sync while typing and ensures the
+      // value is captured even if the field is still focused when saving.
+      input.addEventListener("input", onEdit);
+      input.addEventListener("change", onEdit);
       input.addEventListener("keydown", (ev) => ev.stopPropagation());
     });
     const sensorsHead = this.shadowRoot.getElementById("sensors-head");
@@ -5289,7 +5293,10 @@ if (tmplSelect) {
   }
 
   _syncManualSensorLabelInputs() {
+    const active = this.shadowRoot?.activeElement;
     this.shadowRoot?.querySelectorAll(".sensor-label-input").forEach((input) => {
+      // Don't rewrite the field the user is currently typing in (avoids cursor jumps).
+      if (input === active) return;
       const key = input.dataset?.cfg;
       if (!key) return;
       const value = this._config?.[key] || "";

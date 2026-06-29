@@ -2,6 +2,12 @@
 
 All notable changes to OneLine Room Card are documented here.
 
+## [2.3.1]
+
+* Editor fix: **Room name applies live and on save** — The plain room-name input only updated on blur (`change`), so the live preview kept showing "Room" and the value could be lost if you saved while still typing. It now also updates on `input`, so the name appears immediately and is always persisted. The currently focused field is no longer rewritten mid-typing (no cursor jumps).
+
+---
+
 ## [2.3.0]
 
 * Editor fix: **Room name editable for everyone** — On some HA installs `ha-textfield` did not render in the editor, hiding the room name field. The *Room name* field (top of *Card Behavior*) is now a plain input that always renders, so the header name can reliably be changed.
